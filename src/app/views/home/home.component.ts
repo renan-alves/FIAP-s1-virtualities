@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AngularFireFunctions } from '@angular/fire/functions';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { Observable } from 'rxjs';
 import { IUsers } from 'src/app/interfaces/users';
@@ -15,10 +16,17 @@ export class HomeComponent implements OnInit {
   progress$: Observable<number>;
 
   constructor(
-    private afStorage: AngularFireStorage
+    private afStorage: AngularFireStorage,
+    private afFunctions: AngularFireFunctions
   ) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+
+    const hello = this.afFunctions.httpsCallable<{}>("helloWorld");
+    hello({}).subscribe((res) => {
+      console.log(res);
+    })
+   }
 
   upload(event: { target: { files: File[]; }; }): void {
     this.filePath = event.target.files[0];

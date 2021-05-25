@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
+import { AngularFireFunctionsModule, REGION } from '@angular/fire/functions';
 import { environment } from 'src/environments/environment';
 
 @NgModule({
@@ -17,9 +18,12 @@ import { environment } from 'src/environments/environment';
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule,
-    AngularFireStorageModule
+    AngularFireStorageModule,
+    AngularFireFunctionsModule
   ],
-  providers: [],
+  providers: [
+    { provide: REGION, useValue: 'southamerica-east1' }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
