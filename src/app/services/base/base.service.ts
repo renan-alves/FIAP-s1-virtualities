@@ -16,6 +16,10 @@ export abstract class BaseService<T> {
     return this.fireService.Firestore.collection<T>(this.basePath);
   }
 
+  createFirestoreId(): string {
+    return this.fireService.Firestore.collection("_").doc().id;
+  }
+
   doc$(id: string): Observable<T> {
     return this.collection.doc(id).get().pipe(
       mergeMap((doc) => doc.unwrap$),
@@ -28,9 +32,9 @@ export abstract class BaseService<T> {
     return this.collection.get().pipe(mergeMap((c) => forkJoin(c.docs.map((d) => d.unwrap$))));
   }
 
-  create$(value: T | Omit<T, "id">): Observable<T> {
-    const id = this.fireService.Firestore.collection("_").doc().id;
-    return this.collection.doc(id).set({ ...value, id } as T, { merge: false });
+  create$(value: T, id?: string): Observable<T> {
+    const docId = id ? id : this.createFirestoreId();
+    return this.collection.doc(docId).set(value, { merge: false });
   }
 
   exists$(id: string): Observable<boolean> {

@@ -1,0 +1,103 @@
+<div class="container">
+    <div class="row text-center">
+      <div class="col-12 d-flex flex-column upload">
+        <div *ngIf="currentUser">Oi {{currentUser?.email}}</div>
+        Progresso: {{ progress$ | async }}% Concluído
+        <input class="form-control" type="file" (change)="getFile($event)">
+        <button class="btn btn-primary mt-1" (click)="upload()">Upload</button>
+        <button class="btn btn-primary mt-1" (click)="download()">Download</button>
+      </div>
+    </div>
+  </div>
+  
+  <ng-template #content let-modal>
+    <div [ngSwitch]="modalStep">
+      <ng-container *ngSwitchCase="'login'" [ngTemplateOutlet]="login"></ng-container>
+      <ng-container *ngSwitchCase="'signup'" [ngTemplateOutlet]="signup"></ng-container>
+      <ng-container *ngSwitchCase="'forgotPassword'" [ngTemplateOutlet]="forgotPassword"></ng-container>
+    </div>
+  </ng-template>
+  
+  <ng-template #login>
+    <form [formGroup]="modalForm" class="p-4">
+      <h3>Login</h3>
+      <div class="form-group">
+        <input type="text" formControlName="email" class="form-control" placeholder="Email">
+      </div>
+  
+      <div class="form-group">
+        <input type="password" formControlName="senha" class="form-control" placeholder="Senha">
+      </div>
+  
+      <div class="form-group">
+        <input type="button" class="btn btn-primary" value="Login" (click)="doSignin()">
+      </div>
+  
+      <!-- <div class="form-group">
+        <button type="button" class="btn btn-secondary" (click)="authService.GoogleAuth()">
+          Login com Google
+        </button>
+      </div> -->
+  
+      <div>
+        <a class="modalLink" (click)="goToModalStep('forgotPassword')">Esqueceu a senha?</a>
+      </div>
+  
+      <div>
+        <span>Não tem uma conta? <a class="modalLink" (click)="goToModalStep('signup')">Cadastre-se</a></span>
+      </div>
+    </form>
+  </ng-template>
+  
+  <ng-template #signup>
+    <form [formGroup]="modalForm" class="p-4">
+      <h3>Cadastre-se</h3>
+  
+      <div class="form-group">
+        <input type="text" formControlName="nome" class="form-control" placeholder="Nome">
+      </div>
+  
+      <div class="form-group">
+        <input type="text" formControlName="email" class="form-control" placeholder="Email">
+      </div>
+  
+      <div class="form-group">
+        <input type="password" formControlName="senha" class="form-control" placeholder="Senha">
+      </div>
+  
+      <div class="form-group">
+        <input type="button" class="btn btn-primary" value="Cadastrar" (click)="doSignup()">
+      </div>
+  
+      <div class="form-group">
+        <button type="button" class="btn btn-secondary" (click)="authService.GoogleAuth()">
+          Continue com Google
+        </button>
+      </div>
+  
+      <div class="redirectToLogin">
+        <span>Já tem uma conta? <a class="modalLink" (click)="goToModalStep('login')">Faça login</a></span>
+      </div>
+    </form>
+  </ng-template>
+  
+  <ng-template #forgotPassword>
+    <form [formGroup]="modalForm" class="p-4">
+      <h3>Esqueci minha senha</h3>
+  
+      <div class="form-group">
+        <input type="email" class="form-control" placeholder="Email" formControlName="email">
+      </div>
+  
+      <div class="form-group">
+        <input type="submit" class="btn btn-primary" value="Resetar Senha"
+          (click)="doForgotPassword()">
+      </div>
+  
+      <div>
+        <span>Voltar para <a class="modalLink" (click)="goToModalStep('login')">login</a></span>
+      </div>
+    </form>
+  </ng-template>
+  
+  <button #modalButtom [hidden]="true" (click)="openModal(content)"></button>

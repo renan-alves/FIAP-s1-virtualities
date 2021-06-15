@@ -1,0 +1,18 @@
+.stepper {
+  display: flex;
+  width: 300px;
+  margin-top: .5em;
+
+  .stepper-item {
+    height: 10px;
+    flex: 1;
+    background-color: #F1F1F1;
+    opacity: .7;
+    border-radius: 200px;
+    margin: 0 2px;
+  }
+
+  .active {
+    background-color: #076FBB;
+  }
+}

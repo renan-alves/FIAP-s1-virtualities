@@ -1,9 +1,73 @@
-<div class="container">
-  <div class="row text-center">
-    <div class="col-12 d-flex flex-column upload">
-      Progresso: {{ progress$ | async }}% Concluído
-      <input class="form-control" type="file" (change)="upload($event)">
-      <button class="btn btn-primary mt-1" (click)="uploadImage()">Upload</button>
-    </div>
+<div class="home">
+  <span *ngIf="step == 1 && !active" class="text">
+    Arraste os arquivos para qualquer lugar da tela e cuidamos de tudo
+  </span>
+  <span *ngIf="step == 1 && active" class="text">
+    Pode soltar!
+  </span>
+  <span *ngIf="step == 2" class="text">
+    Defina as configurações de segurança para seu arquivo
+  </span>
+  <span *ngIf="step == 3" class="text">
+    Defina por quanto tempo e quantas vezes o link poderá ser baixado
+  </span>
+
+  <div class="box" [class.expandable]="files.length > 0">
+    <ng-container [ngSwitch]="step">
+      <ng-container *ngSwitchCase="1" [ngTemplateOutlet]="step1"></ng-container>
+      <ng-container *ngSwitchCase="2" [ngTemplateOutlet]="step2"></ng-container>
+      <ng-container *ngSwitchCase="3" [ngTemplateOutlet]="step3"></ng-container>
+      <ng-container *ngSwitchCase="4" [ngTemplateOutlet]="step4"></ng-container>
+    </ng-container>
   </div>
+
+  <app-stepper [step]=step></app-stepper>
+
+  <button (click)="nextStep()"> {{buttonText}} </button>
 </div>
+
+<div class="dropzone" [ngStyle]="{'z-index':active ? 9 : -9 }"></div>
+
+<ng-template #step1>
+  <div class="title">
+    Adicionar arquivos
+    <input type="file" #fileInput class="file-input" multiple (change)="onFileSelected($event)" />
+    <a (click)="openFileInput()">
+      <img src="/assets/plus-fill-circle.svg" height="28px" width="28px" />
+    </a>
+  </div>
+  <div class="table">
+    <table>
+      <tr *ngFor="let file of files">
+        <td>{{file.name}}</td>
+        <td>&nbsp;|&nbsp;</td>
+        <td>{{file.size}} bytes</td>
+      </tr>
+    </table>
+  </div>
+</ng-template>
+
+<ng-template #step2>
+  <div class="form-group">
+    Proteger com senha <input type="checkbox" id="requirePassword" class="form-check-input" />
+  </div>
+  <div class="form-group">
+    <input type="text" id="password" class="form-control" placeholder="Defina sua senha" />
+  </div>
+  <button> Gerar senha aleatória </button>
+</ng-template>
+
+<ng-template #step3>
+  <div class="form-group">
+    Permitir download anônimo <input type="checkbox" id="isAnonymous" class="form-check-input" />
+  </div>
+</ng-template>
+
+<ng-template #step4>
+  <div class="form-group">
+    <input type="datetime-local" id="expirationDate" class="form-control" />
+  </div>
+  <div class="form-group">
+    <input type="number" id="downloadLimit" class="form-control" placeholder="Limites de download" />
+  </div>
+</ng-template>

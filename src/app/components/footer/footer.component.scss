@@ -1,0 +1,52 @@
+.footer {
+  display: flex;
+  justify-content: space-between;
+	align-items: center;
+  background-color: black;
+  color: white;
+	padding: 0 3em;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+	height: 100px;
+  width: 100%;
+
+	.logo {
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    font-size: 24px;
+    font-weight: bold;
+		margin-right: 2em;
+  }
+
+	.social {
+		display: flex;
+		align-items: center;
+
+		img {
+			margin: 0 .5em;
+		}
+	}
+
+  .info {
+    ul {
+      display: flex;
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+      color: white;
+
+      li a {
+        font-size: 14px;
+        font-weight: 400;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+}
