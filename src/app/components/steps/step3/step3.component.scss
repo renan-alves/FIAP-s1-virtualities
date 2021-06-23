@@ -1,0 +1,26 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+
+  .checkbox {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    span {
+      font-size: 14px;
+    }
+
+    input {
+      height: 25px;
+      width: 25px;
+    }
+  }
+
+  p {
+    color: white;
+    width: 100%;
+  }
+}

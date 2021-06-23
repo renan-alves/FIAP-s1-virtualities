@@ -1,7 +1,7 @@
-import { Inject, Injectable } from "@angular/core";
-import { map, mapTo, mergeMap, mergeMapTo } from "rxjs/operators";
-import { forkJoin, from, iif, Observable, of, throwError } from "rxjs";
-import { FireCollection, FireQuery, FireService } from "./fire.service";
+import { Inject, Injectable } from '@angular/core';
+import { map, mapTo, mergeMap, mergeMapTo } from 'rxjs/operators';
+import { forkJoin, from, iif, Observable, of, throwError } from 'rxjs';
+import { FireCollection, FireQuery, FireService } from './fire.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +17,7 @@ export abstract class BaseService<T> {
   }
 
   createFirestoreId(): string {
-    return this.fireService.Firestore.collection("_").doc().id;
+    return this.fireService.Firestore.collection('_').doc().id;
   }
 
   doc$(id: string): Observable<T> {

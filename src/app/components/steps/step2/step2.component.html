@@ -1,0 +1,11 @@
+<div class="form">
+  <div class="checkbox">
+    <span>Proteger com senha</span>
+    <input type="checkbox" [formControl]="requirePassword" (change)="toggleForm()" class="form-check-input" />
+  </div>
+  <div class="input">
+    <input type="password" [formControl]="password"
+      class="form-control" placeholder="Defina sua senha" />
+  </div>
+  <button (click)="generateRandomPassword()" [disabled]="toggle"> Gerar senha aleatória </button>
+</div>

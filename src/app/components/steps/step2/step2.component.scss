@@ -1,0 +1,35 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+
+  .checkbox {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    span {
+      font-size: 16px;
+    }
+
+    input {
+      height: 25px;
+      width: 25px;
+    }
+  }
+
+  .input {
+    margin-bottom: 10px;
+  }
+
+  button {
+    background: #E0E0E0;
+    color: black;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 100px;
+    padding: .5em 1em;
+    font-size: 16px;
+    font-weight: normal;
+  }
+}

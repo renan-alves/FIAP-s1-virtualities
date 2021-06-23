@@ -1,0 +1,19 @@
+<div class="title">
+  Adicionar arquivos
+  <input type="file" #fileInput class="file-input" multiple (change)="onFileSelected($event)" />
+  <a (click)="openFileInput()">
+    <span class="icon icon-plus"></span>
+  </a>
+</div>
+<div class="table">
+  <div class="item" *ngFor="let file of files; let i = index">
+    <div class="name">{{file.name}}</div>
+    <div class="size">&nbsp;|&nbsp;{{humanFileSize(file.size)}}</div>
+    <a class="remove" (click)="removeFile(i)">
+      <span class="icon icon-remove"></span>
+    </a>
+  </div>
+</div>
+<div class="limit" *ngIf="files.length > 0">
+  20MB restantes
+</div>

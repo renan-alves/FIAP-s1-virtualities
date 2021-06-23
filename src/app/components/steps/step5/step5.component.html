@@ -1,0 +1,17 @@
+<div *ngIf="!uploaded" class="form-progress-bar">
+  Fazendo o upload:
+  <div>
+    <ngb-progressbar [showValue]="true" [value]="(progress$ | async)"></ngb-progressbar>
+  </div>
+</div>
+<div *ngIf="uploaded" class="form">
+  <div class="input">
+    <input type="text"
+      class="form-control" />
+  </div>
+  <p>Seu arquivo expirará em: 21/12/2021</p>
+  <a>
+    <span class="icon icon-qr"></span>
+    <span>Gerar QR Code</span>
+  </a>
+</div>

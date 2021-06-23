@@ -1,37 +1,50 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/storage';
-import * as JSZip from 'jszip';
+import JSZip from 'jszip';
 import { Observable } from 'rxjs';
 import { IFiles } from 'src/app/interfaces/files';
 import { FilessService } from 'src/app/services/files/files.service';
 import * as CryptoJS from 'crypto-js';
+import * as stepMessages from '../../../assets/texts/stepsMessages.json';
+import { NgbProgressbarConfig } from '@ng-bootstrap/ng-bootstrap';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+  styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-  @ViewChild('fileInput') fileInput: ElementRef;
-
   preventBodyDrop: boolean = false;
   active: boolean = false;
 
   files: File[] = [];
   step: number = 1;
   buttonText: string = 'Ok, próximo';
+  stepMessages: string[];
   progress$: Observable<number>;
+  uploaded: boolean;
 
   password: string;
   requirePassword: boolean;
   isAnonymous: boolean;
   downloadLimit: number;
-  expirationDate: string;
+  expirationDate: number;
 
-  constructor(private afStorage: AngularFireStorage,
-    private filesService: FilessService) { }
+  constructor(
+    private afStorage: AngularFireStorage,
+    private filesService: FilessService,
+    private config: NgbProgressbarConfig,
+    private httpClient: HttpClient) {
+  }
 
   ngOnInit(): void {
+    this.stepMessages = stepMessages.messages;
+    this.config.max = 100;
+    this.config.striped = true;
+    this.config.animated = true;
+    this.config.type = 'primary';
+    this.config.height = '20px';
   }
 
   async generateLink() {
@@ -46,7 +59,7 @@ export class HomeComponent implements OnInit {
       dateCreated: Date.now(),
       docId,
       downloadLimit: this.downloadLimit,
-      expirationDate: Date.parse(this.expirationDate),
+      expirationDate: this.expirationDate,
       isAnonymous: this.isAnonymous,
       requirePassword: this.requirePassword
     }
@@ -61,6 +74,7 @@ export class HomeComponent implements OnInit {
 
   async uploadFiles(filename: string): Promise<void> {
     let fileToUpload: File;
+    let path: string;
     if (this.files.length > 1) {
       let zip = new JSZip();
 
@@ -69,49 +83,55 @@ export class HomeComponent implements OnInit {
         zip.file(filename, file)
       }
 
+      const date = new Date();
+      const zipName = date.toLocaleDateString().replace(/\//g, '-');
+
       await zip.generateAsync({ type: 'blob' }).then((blobdata) => {
-        fileToUpload = new File([blobdata], filename + ".zip");
+        fileToUpload = new File([blobdata], 'segue-' + zipName + '.zip');
+        path = '/' + filename + '/' + fileToUpload.name;
       });
     }
-    else fileToUpload = this.files[0];
+    else {
+      fileToUpload = this.files[0];
+      path = '/' + filename + '/' + fileToUpload.name;
+    }
 
-    const task = this.afStorage.upload('/' + filename, fileToUpload);
+    const task = this.afStorage.upload(path, fileToUpload);
     this.progress$ = task.percentageChanges();
-  }
-
-  getPassword() {
-    this.password = (document.getElementById("password") as HTMLInputElement).value;
-    this.requirePassword = (document.getElementById("requirePassword") as HTMLInputElement).checked;
-  }
-
-  getFileParams() {
-    this.downloadLimit = +(document.getElementById("downloadLimit") as HTMLInputElement).value;
-    this.expirationDate = (document.getElementById("expirationDate") as HTMLInputElement).value;
-  }
-
-  getAnonymousParams() {
-    this.isAnonymous = (document.getElementById("isAnonymous") as HTMLInputElement).checked;
+    task.then(() => this.uploaded = true)
   }
 
   nextStep() {
+    console.log(this.step);
     this.step++;
     switch (this.step) {
       case 1: this.buttonText = 'Ok, próximo'; break;
       case 2: this.buttonText = 'Próximo'; break;
-      case 3: this.getPassword(); this.buttonText = 'Próximo'; break;
-      case 4: this.getAnonymousParams(); this.buttonText = 'Criar link'; break;
-      case 5: this.getFileParams(); this.generateLink(); break;
+      case 3: this.buttonText = 'Próximo'; break;
+      case 4: this.buttonText = 'Criar link'; break;
     }
+
   }
 
-  openFileInput() {
-    this.fileInput.nativeElement.click();
+  handleStep1(file: File): void {
+    this.files.push(file);
+    this.active = false;
   }
 
-  onFileSelected(event: { target: { files: File[]; }; }): void {
-    Object.values(event.target.files).forEach(file => {
-      this.files.push(file);
-    });
+  handleStep2(password: { requirePassword: boolean, password: string }) {
+    this.password = password.password;
+    this.requirePassword = password.requirePassword;
+  }
+
+  handleStep3(allowAnonymous: { allowAnonymous: boolean }) {
+    this.isAnonymous = allowAnonymous.allowAnonymous;
+  }
+
+  handleStep4(limit: { expirationDate: number, downloadLimit: number }) {
+    this.expirationDate = limit.expirationDate;
+    this.downloadLimit = limit.downloadLimit;
+
+    this.generateLink();
   }
 
   @HostListener('dragover', ['$event'])
@@ -142,6 +162,8 @@ export class HomeComponent implements OnInit {
       }
       dataTransfer.items.clear();
     }
+
+    this.active = false;
   }
 
   @HostListener('body:dragover', ['$event'])

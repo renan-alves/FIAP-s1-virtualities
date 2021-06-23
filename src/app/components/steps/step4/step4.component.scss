@@ -1,0 +1,17 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+
+  input {
+    margin-bottom: 10px;
+  }
+
+  span {
+    margin-top: 10px;
+    text-align: center;
+    color: white;
+    font-weight: 600;
+    font-size: 12px;
+  }
+}

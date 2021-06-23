@@ -1,0 +1,99 @@
+.title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 20px;
+  padding: 5px 10px;
+
+  img {
+    margin: .5em;
+  }
+
+  .file-input {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+  }
+}
+
+.table {
+  max-height: 100px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-bottom: 0;
+  color: white;
+
+  .item {
+    display: flex;
+    padding: 5px 0;
+
+    .name {
+      flex: 7;
+      white-space: nowrap;
+      overflow: hidden !important;
+      text-overflow: ellipsis;
+    }
+
+    .size {
+      flex: 3;
+    }
+
+    .remove {
+      flex: 1;
+      text-align: center;
+    }
+  }
+}
+
+.limit {
+  margin-top: 5px;
+  color: #076FBB;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: auto;
+  background-repeat: no-repeat;
+
+  &.icon-plus {
+    width: 28px;
+    height: 28px;
+    background-image: url(~src/assets/icons/plus-fill-circle.svg);
+  }
+
+  &.icon-remove {
+    width: 12px;
+    height: 14px;
+    background-image: url(~src/assets/icons/delete-trashcan.svg);
+  }
+
+  &:hover,
+  &:focus {
+    filter: invert(30%) sepia(100%) saturate(921%) hue-rotate(175deg) brightness(97%) contrast(97%);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6B6B6B;
+  border-radius: 15px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c4c4c4;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+  border-radius: 0;
+  box-shadow: inset 7px 10px 12px #f0f0f0;
+}

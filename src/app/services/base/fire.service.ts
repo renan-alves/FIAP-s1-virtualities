@@ -1,9 +1,9 @@
-import { Inject, Injectable, Optional } from "@angular/core";
-import firebase from "firebase/app";
-import { from, iif, Observable, of, throwError } from "rxjs";
-import { map, mergeMap, mergeMapTo } from "rxjs/operators";
-import { environment } from "src/environments/environment";
-import { App, FirebaseOptions } from "./firebase.options";
+import { Inject, Injectable, Optional } from '@angular/core';
+import firebase from 'firebase/app';
+import { from, iif, Observable, of, throwError } from 'rxjs';
+import { map, mergeMap, mergeMapTo } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
+import { App, FirebaseOptions } from './firebase.options';
 
 import FirestoreCollectionReference = firebase.firestore.CollectionReference;
 import FirestoreDocumentReference = firebase.firestore.DocumentReference;
@@ -50,9 +50,9 @@ const FirebaseObservableToRXJS = <T = unknown, U = unknown, V = unknown, E = Err
 };
 
 export enum FirebaseAuthPersistance {
-  LOCAL = "local",
-  SESSION = "session",
-  NONE = "none",
+  LOCAL = 'local',
+  SESSION = 'session',
+  NONE = 'none',
 };
 
 export type FirestoreHandler = {
@@ -71,11 +71,11 @@ export type FirestoreHandler = {
   terminate(): Observable<void>;
   useEmulator(host: string, port: number): void;
   waitForPendingWrites(): Observable<void>;
-  setLogLevels(level: "debug" | "error" | "silent"): void;
+  setLogLevels(level: 'debug' | 'error' | 'silent'): void;
 }
 
 const tryUnwrapDocument = <T = unknown>(snapshot: { data(): T | undefined, id: string, exists: boolean }): Observable<T> => {
-  return iif(() => snapshot.exists, of({ ...(snapshot.data() || {}), id: snapshot.id } as unknown as T), throwError({ type: "error", reason: "document_not_exists" }));
+  return iif(() => snapshot.exists, of({ ...(snapshot.data() || {}), id: snapshot.id } as unknown as T), throwError({ type: 'error', reason: 'document_not_exists' }));
 }
 
 export type FireWriteBatch = {
@@ -87,10 +87,10 @@ export type FireWriteBatch = {
 }
 
 const createFireWriteBatch = (
-  set: FireWriteBatch["set"],
-  remove: FireWriteBatch["delete"],
-  update: FireWriteBatch["update"],
-  commit$: FireWriteBatch["commit$"],
+  set: FireWriteBatch['set'],
+  remove: FireWriteBatch['delete'],
+  update: FireWriteBatch['update'],
+  commit$: FireWriteBatch['commit$'],
   origin: WriteBatch,
 ): FireWriteBatch => ({ set, delete: remove, update, commit$, origin });
 
@@ -127,9 +127,9 @@ const convertQueryDocumentSnapshot = <T = unknown>(snapshot: FirestoreQueryDocum
 };
 
 export type FireDocumentChangeType =
-  | "added"
-  | "removed"
-  | "modified";
+  | 'added'
+  | 'removed'
+  | 'modified';
 
 export type FireDocumentChange<T = unknown> = {
   doc: FireQueryDocumentSnapshot<T>,
@@ -301,22 +301,22 @@ const convertCollection = <T = unknown>(collection: FirestoreCollectionReference
 });
 
 const createFirestoreHandler = (firestore: Firestore): FirestoreHandler => {
-  const batch: FirestoreHandler["batch"] = () => convertWriteBatch(firestore.batch());
-  const clearPersistence: FirestoreHandler["clearPersistence"] = () => from(firestore.clearPersistence());
-  const collection: FirestoreHandler["collection"] = <T = unknown>(name: string) => convertCollection(firestore.collection(name) as FirestoreCollectionReference<T>);
-  const collectionGroup: FirestoreHandler["collectionGroup"] = <T = unknown>(collectionId: string) => convertQuery(firestore.collectionGroup(collectionId) as FirestoreQuery<T>);
-  const disableNetwork: FirestoreHandler["disableNetwork"] = () => from(firestore.disableNetwork());
-  const doc: FirestoreHandler["doc"] = <T = unknown>(documentPath: string) => convertDocument(firestore.doc(documentPath) as FirestoreDocumentReference<T>);
-  const enableNetwork: FirestoreHandler["enableNetwork"] = () => from(firestore.enableNetwork());
-  const enablePersistence: FirestoreHandler["enablePersistence"] = () => from(firestore.enablePersistence());
-  const loadBundle: FirestoreHandler["loadBundle"] = (bundleData: string | ArrayBuffer | ReadableStream<Uint8Array>) => firestore.loadBundle(bundleData);
-  const namedQuery: FirestoreHandler["namedQuery"] = <T = unknown>(name: string) => from(firestore.namedQuery(name) as Promise<FirestoreQuery<T>>).pipe(map(convertQuery));
-  const onSnapshotsInSync$: FirestoreHandler["onSnapshotsInSync$"] = FirebaseObservableToRXJS<void, unknown, unknown, Error>(firestore.onSnapshotsInSync.bind(firestore));
-  const settings: FirestoreHandler["settings"] = (settings) => firestore.settings(settings);
-  const terminate: FirestoreHandler["terminate"] = () => from(firestore.terminate());
-  const useEmulator: FirestoreHandler["useEmulator"] = (host, port) => firestore.useEmulator(host, port);
-  const waitForPendingWrites: FirestoreHandler["waitForPendingWrites"] = () => from(firestore.waitForPendingWrites());
-  const setLogLevels: FirestoreHandler["setLogLevels"] = (level) => firebase.firestore.setLogLevel(level);
+  const batch: FirestoreHandler['batch'] = () => convertWriteBatch(firestore.batch());
+  const clearPersistence: FirestoreHandler['clearPersistence'] = () => from(firestore.clearPersistence());
+  const collection: FirestoreHandler['collection'] = <T = unknown>(name: string) => convertCollection(firestore.collection(name) as FirestoreCollectionReference<T>);
+  const collectionGroup: FirestoreHandler['collectionGroup'] = <T = unknown>(collectionId: string) => convertQuery(firestore.collectionGroup(collectionId) as FirestoreQuery<T>);
+  const disableNetwork: FirestoreHandler['disableNetwork'] = () => from(firestore.disableNetwork());
+  const doc: FirestoreHandler['doc'] = <T = unknown>(documentPath: string) => convertDocument(firestore.doc(documentPath) as FirestoreDocumentReference<T>);
+  const enableNetwork: FirestoreHandler['enableNetwork'] = () => from(firestore.enableNetwork());
+  const enablePersistence: FirestoreHandler['enablePersistence'] = () => from(firestore.enablePersistence());
+  const loadBundle: FirestoreHandler['loadBundle'] = (bundleData: string | ArrayBuffer | ReadableStream<Uint8Array>) => firestore.loadBundle(bundleData);
+  const namedQuery: FirestoreHandler['namedQuery'] = <T = unknown>(name: string) => from(firestore.namedQuery(name) as Promise<FirestoreQuery<T>>).pipe(map(convertQuery));
+  const onSnapshotsInSync$: FirestoreHandler['onSnapshotsInSync$'] = FirebaseObservableToRXJS<void, unknown, unknown, Error>(firestore.onSnapshotsInSync.bind(firestore));
+  const settings: FirestoreHandler['settings'] = (settings) => firestore.settings(settings);
+  const terminate: FirestoreHandler['terminate'] = () => from(firestore.terminate());
+  const useEmulator: FirestoreHandler['useEmulator'] = (host, port) => firestore.useEmulator(host, port);
+  const waitForPendingWrites: FirestoreHandler['waitForPendingWrites'] = () => from(firestore.waitForPendingWrites());
+  const setLogLevels: FirestoreHandler['setLogLevels'] = (level) => firebase.firestore.setLogLevel(level);
   return {
     batch,
     clearPersistence,
@@ -339,7 +339,7 @@ const createFirestoreHandler = (firestore: Firestore): FirestoreHandler => {
 export type QueryFn<T = unknown> = (f: FireCollection<T>) => FireQuery<T>;
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
 export class FireService {
   private _firestore: Firestore;
