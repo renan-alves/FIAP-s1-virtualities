@@ -4,10 +4,9 @@ import JSZip from 'jszip';
 import { Observable } from 'rxjs';
 import { IFiles } from 'src/app/interfaces/files';
 import { FilessService } from 'src/app/services/files/files.service';
-import * as CryptoJS from 'crypto-js';
+import CryptoJS from 'crypto-js';
 import * as stepMessages from '../../../assets/texts/stepsMessages.json';
 import { NgbProgressbarConfig } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
@@ -24,6 +23,7 @@ export class HomeComponent implements OnInit {
   stepMessages: string[];
   progress$: Observable<number>;
   uploaded: boolean;
+  id: string;
 
   password: string;
   requirePassword: boolean;
@@ -34,8 +34,7 @@ export class HomeComponent implements OnInit {
   constructor(
     private afStorage: AngularFireStorage,
     private filesService: FilessService,
-    private config: NgbProgressbarConfig,
-    private httpClient: HttpClient) {
+    private config: NgbProgressbarConfig) {
   }
 
   ngOnInit(): void {
@@ -54,6 +53,7 @@ export class HomeComponent implements OnInit {
 
   async saveFilesData(): Promise<string> {
     const docId = this.filesService.createFirestoreId();
+    this.id = docId;
     const files: IFiles = {
       active: true,
       dateCreated: Date.now(),

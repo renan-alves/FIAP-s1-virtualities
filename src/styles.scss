@@ -1,6 +1,37 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans');
 
 body {
-  background-color: lightgrey;
+  background-color: black;
+  background-image: url(assets/backgrounds/background-1.png);
+  background-size: cover;
+  background-repeat: no-repeat;
   font-family: "Open Sans", sans-serif;
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  border-radius: 100px;
+  border: 0;
+  padding: 10px 40px;
+  font-size: 18px;
+  white-space: nowrap;
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.5s;
+
+  &.primary {
+    color: white;
+    background-color: #076FBB;
+  }
+
+  &.secondary {
+    color: black;
+    background-color: #E0E0E0;
+  }
+
+  &:after,
+  &:hover {
+    opacity: .5;
+    transition: all;
+  }
 }

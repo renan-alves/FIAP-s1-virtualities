@@ -1,4 +1,4 @@
-.home {
+.signin {
   display: flex;
   flex-direction: column;
   height: calc(100vh - 160px);
@@ -6,29 +6,12 @@
   justify-content: center;
   color: white;
 
-  .text {
-    color: white;
-    font-size: 2rem;
-    font-weight: 600;
-  }
-
   .box {
     background-color: rgba($color: #000000, $alpha: .7);
-    padding: 1em;
-    width: 300px;
+    padding: 3em;
+    width: 430px;
+    height: 450px;
     border-radius: 10px;
     font-size: 12px;
   }
-
-  .expandable {
-    height: 200px;
-  }
-}
-
-.dropzone {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
 }

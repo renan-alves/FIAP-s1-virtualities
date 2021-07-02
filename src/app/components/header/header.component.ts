@@ -7,9 +7,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HeaderComponent implements OnInit {
 
+  expanded: boolean;
+
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  toggleHamburger() {
+    this.expanded = !this.expanded;
   }
 
 }

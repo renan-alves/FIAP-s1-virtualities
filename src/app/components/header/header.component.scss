@@ -1,18 +1,20 @@
 .header {
   display: flex;
   justify-content: space-between;
+  padding: 8px;
+  position: relative;
 
   .logo {
     display: flex;
     align-items: center;
     justify-items: center;
-    margin: 0 2em;
+    margin: 0 1em;
     font-size: 24px;
     font-weight: bold;
+    color: white;
   }
 
   .menu {
-    display: flex;
     align-items: center;
     justify-content: space-around;
     height: 60px;
@@ -23,10 +25,11 @@
       display: flex;
       margin: 0;
       padding: 0;
-      list-style-type: none;   
-      color: white;
+      list-style-type: none;
+      
 
-      li a{
+      li a {
+        color: white;
         font-size: 18px;
         font-weight: 600;
         cursor: pointer;
@@ -34,6 +37,47 @@
         &:hover {
           text-decoration: underline;
         }
+      }
+    }
+
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: auto;
+    background-repeat: no-repeat;
+    width: 32px;
+    height: 32px;
+    background-image: url(~src/assets/icons/hamburger.svg);
+
+    &:hover,
+    &:focus {
+      filter: invert(30%) sepia(100%) saturate(921%) hue-rotate(175deg) brightness(97%) contrast(97%);
+    }
+  }
+
+  .list {
+    position: absolute;
+    top: 52px;
+    left: 0;
+    right: 0;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    ul {
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      list-style-type: none;
+      color: white;
+
+      li a {
+        font-size: 18px;
+        font-weight: 600;
       }
     }
   }

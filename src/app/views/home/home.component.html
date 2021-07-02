@@ -1,5 +1,5 @@
 <div class="home">
-  <span *ngIf="!active" class="text">
+  <span *ngIf="!active" class="text d-none d-md-block">
     {{stepMessages[step - 1]}}
   </span>
   <span *ngIf="step == 1 && active" class="text">
@@ -18,7 +18,7 @@
 
   <app-stepper [step]=step></app-stepper>
 
-  <button (click)="nextStep()" [disabled]="files.length == undefined || files.length == 0">
+  <button (click)="nextStep()" class="button primary" [disabled]="files.length == undefined || files.length == 0">
     {{buttonText}}
   </button>
 </div>
@@ -42,5 +42,5 @@
 </ng-template>
 
 <ng-template #step5>
-   <app-step5 [progress$]="progress$" [uploaded]="uploaded"></app-step5>
+   <app-step5 [progress$]="progress$" [uploaded]="uploaded" [id]="id" [expireIn]="expirationDate"></app-step5>
 </ng-template>

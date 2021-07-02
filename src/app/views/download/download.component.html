@@ -1,1 +1,38 @@
-<button (click)="testDownload()">TESTE DOWNLOAD</button>
+<div class="download">
+
+  <div class="box">
+    
+    <!-- Arquivo existe -->
+    <ng-container *ngIf="file">
+      <span>Você recebeu um link</span>
+
+      <!-- Arquivo tem senha -->
+      <ng-container *ngIf="file.requirePassword">
+        <p>Insira a chave de segurança para baixar</p>
+        <input type="password" [formControl]="password" class="form-control" placeholder="Senha" />
+        <small *ngIf="invalidPassword">Senha inválida</small>
+      </ng-container>
+
+      <!-- Arquivo sem senha -->
+      <ng-container *ngIf="!file.requirePassword">
+        Tudo pronto!
+      </ng-container>
+    </ng-container>
+
+    <!-- Arquivo não existe / indisponível -->
+    <ng-container *ngIf="!file && !downloaded">
+      <span>Oops!</span>
+      {{unavailableReason}}
+    </ng-container>
+
+    <!-- Já baixou -->
+    <ng-container *ngIf="!file && downloaded">
+      <span>Download iniciado!</span>
+    </ng-container>
+    
+    <button (click)="download(file)" *ngIf="file && !unavailableReason && !downloaded">Download</button>
+
+    <a>Quer compartilhar também?</a>
+  </div>
+
+</div>

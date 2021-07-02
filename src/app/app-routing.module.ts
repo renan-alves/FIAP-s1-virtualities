@@ -11,6 +11,16 @@ const routes: Routes = [
     path: 'download/:fileId',
     loadChildren: () => import('./views/download/download.module')
       .then(m => m.DownloadModule)
+  },
+  {
+    path: 'login',
+    loadChildren: () => import('./views/sign-in/sign-in.module')
+      .then(m => m.SignInModule)
+  },
+  {
+    path: 'register',
+    loadChildren: () => import('./views/sign-up/sign-up.module')
+      .then(m => m.SignUpModule)
   }
 ];
 
