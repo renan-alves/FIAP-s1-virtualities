@@ -1,5 +1,9 @@
 export interface IUsers {
   uid: string;
+  name: string;
   email: string;
-  displayName: string;
+  country: string;
+  state: string;
+  birthday: number;
+  password: string;
 }

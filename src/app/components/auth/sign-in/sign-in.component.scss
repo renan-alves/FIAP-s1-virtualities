@@ -1,4 +1,8 @@
 .form {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+
   form {
     display: flex;
     flex-direction: column;
@@ -13,5 +17,16 @@
 
   span {
     font-size: 28px;
+  }
+
+  p {
+    a {
+      text-decoration: none;
+      color: white;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 }

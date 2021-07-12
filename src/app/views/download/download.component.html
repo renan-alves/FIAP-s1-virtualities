@@ -30,7 +30,7 @@
       <span>Download iniciado!</span>
     </ng-container>
     
-    <button (click)="download(file)" *ngIf="file && !unavailableReason && !downloaded">Download</button>
+    <button class="button primary" (click)="download(file)" *ngIf="file && !unavailableReason && !downloaded">Download</button>
 
     <a>Quer compartilhar também?</a>
   </div>

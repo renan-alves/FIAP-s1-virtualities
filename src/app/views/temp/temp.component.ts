@@ -87,19 +87,19 @@ export class TempComponent implements OnInit, AfterViewInit {
     })
   }
 
-  doSignup() {
-    this.authService.SignUp(this.modalForm.value).then((result) => {
-      this.currentUser = {
-        uid: result.user.uid,
-        email: result.user.email,
-        displayName: this.modalForm.value['nome']
-      };
-      this.authService.SetUserData(this.currentUser);
-      this.modalService.dismissAll();
-    }).catch((error) => {
-      window.alert(error.message)
-    })
-  }
+  // doSignup() {
+  //   this.authService.SignUp(this.modalForm.value).then((result) => {
+  //     this.currentUser = {
+  //       uid: result.user.uid,
+  //       email: result.user.email,
+  //       displayName: this.modalForm.value['nome']
+  //     };
+  //     this.authService.SetUserData(this.currentUser);
+  //     this.modalService.dismissAll();
+  //   }).catch((error) => {
+  //     window.alert(error.message)
+  //   })
+  // }
 
   doForgotPassword() {
     this.authService.ForgotPassword(this.modalForm.value).then(() => {

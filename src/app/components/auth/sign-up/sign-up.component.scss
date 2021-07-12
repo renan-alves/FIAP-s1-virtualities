@@ -1,0 +1,33 @@
+.form {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .form-group {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  
+    span {
+      font-size: 28px;
+    }
+  
+    p {
+      a {
+        text-decoration: none;
+        color: white;
+  
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+  

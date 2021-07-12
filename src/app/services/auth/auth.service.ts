@@ -14,12 +14,10 @@ export class AuthService {
   userData: firebase.User;
 
   constructor(
-    private afs: AngularFirestore,
     private afAuth: AngularFireAuth,
-    private router: Router,  
-    private ngZone: NgZone,
-    private usersService: UserssService
-  ) {    
+    private usersService: UserssService,
+    private route: Router
+  ) {
     this.afAuth.authState.subscribe(user => {
       if (user) {
         this.userData = user;
@@ -32,15 +30,15 @@ export class AuthService {
     })
   }
 
-  SignIn(form: {email: string, senha: string}) {
-    return this.afAuth.signInWithEmailAndPassword(form.email, form.senha);
+  SignIn(email: string, senha: string): Promise<firebase.auth.UserCredential> {
+    return this.afAuth.signInWithEmailAndPassword(email, senha);
   }
 
-  SignUp(form: {email: string, senha: string}) {
-    return this.afAuth.createUserWithEmailAndPassword(form.email, form.senha);
+  SignUp(email: string, senha: string): Promise<firebase.auth.UserCredential> {
+    return this.afAuth.createUserWithEmailAndPassword(email, senha);
   }
 
-  ForgotPassword(form: {email: string}) {
+  ForgotPassword(form: { email: string }): Promise<void> {
     return this.afAuth.sendPasswordResetEmail(form.email);
   }
 
@@ -49,31 +47,27 @@ export class AuthService {
     return (user !== null) ? true : false; // && user.emailVerified !== false
   }
 
-  get getCurrentUser(): IUsers {
+  get getCurrentUser(): firebase.User {
     return JSON.parse(localStorage.getItem('user'));
   }
 
-  // GoogleAuth() {
-  //   return this.AuthLogin(new auth.GoogleAuthProvider());
-  // }
-
-  // AuthLogin(provider) {
-  //   return this.afAuth.signInWithPopup(provider)
-  //   .then((result) => {
-  //      this.ngZone.run(() => {
-  //         this.router.navigate(['dashboard']);
-  //       })
-  //     this.SetUserData(result.user);
-  //   }).catch((error) => {
-  //     window.alert(error)
-  //   })
-  // }
-
-  SetUserData(user: IUsers) {
-    this.usersService.create$(user, user.uid);
+  GoogleAuth() {
+    this.AuthLogin(new firebase.auth.GoogleAuthProvider());
   }
 
-  SignOut() {
+  AuthLogin(provider: firebase.auth.AuthProvider) {
+    this.afAuth.signInWithPopup(provider).then(result => {
+      this.usersService.exists$(result.user.uid).subscribe(user => {
+        console.log(user);
+        if (user)
+          this.route.navigate(['/']);
+        else
+          this.route.navigate(['/register']);
+      })
+    })
+  }
+
+  SignOut(): Promise<void> {
     return this.afAuth.signOut().then(() => {
       localStorage.removeItem('user');
     })

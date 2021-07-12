@@ -3,6 +3,10 @@
   justify-content: space-between;
   padding: 8px;
   position: relative;
+  
+  a {
+    text-decoration: none;
+  }
 
   .logo {
     display: flex;
