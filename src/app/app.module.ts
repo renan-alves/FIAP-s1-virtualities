@@ -10,17 +10,15 @@ import { AngularFireFunctionsModule, REGION } from '@angular/fire/functions';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { environment } from 'src/environments/environment';
 import { AuthService } from './services/auth/auth.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
-import { TempComponent } from './views/temp/temp.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
     FooterComponent,
-    TempComponent
   ],
   imports: [
     CommonModule,
@@ -34,7 +32,8 @@ import { TempComponent } from './views/temp/temp.component';
   ],
   providers: [
     { provide: REGION, useValue: 'southamerica-east1' },
-    AuthService
+    AuthService,
+    DatePipe
   ],
   bootstrap: [AppComponent],
   schemas: [

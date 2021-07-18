@@ -38,6 +38,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('home ')
     this.stepMessages = stepMessages.messages;
     this.config.max = 100;
     this.config.striped = true;
