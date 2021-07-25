@@ -1,0 +1,37 @@
+<div class="container-fluid min-vh-100" style="background-color: white;">
+  <h3><strong>Seu público</strong></h3>
+	<div class="row">
+		<div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="card-title">Local de Downloads</h2>
+          <div class="chart-container">
+            <canvas #doughnutCanvas></canvas>
+          </div>
+        </div>
+      </div>
+		</div>
+		<div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title">Downloads por faixa etária</h2>
+          <div class="chart-container" style="height: 400px;">
+            <canvas #verticalBarCanvas></canvas>
+          </div>
+        </div>
+      </div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title">Downloads dos últimos 7 dias</h2>
+          <div class="chart-container" style="height: 400px;">
+            <canvas #lineCanvas></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+	</div>
+</div>
