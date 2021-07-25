@@ -19,6 +19,7 @@ export class AuthService {
     private route: Router
   ) {
     this.afAuth.authState.subscribe(user => {
+      console.log(user);
       if (user) {
         this.userData = user;
         localStorage.setItem('user', JSON.stringify(this.userData));

@@ -16,4 +16,5 @@ export interface IFiles {
 
 export interface IUsersFiles extends IUsers {
   downloadDate: number;
+  customers?: IUsers[];
 }

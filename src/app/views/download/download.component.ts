@@ -26,6 +26,7 @@ export class DownloadComponent implements OnInit {
 
   ngOnInit(): void {
     this.filesService.doc$(this.route.snapshot.paramMap.get('fileId')).subscribe(file => {
+      console.log(JSON.stringify(file.customers));
       if (this.checkAvailability(file))
         this.file = file
 
