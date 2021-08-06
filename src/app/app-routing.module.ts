@@ -22,7 +22,11 @@ const routes: Routes = [
     loadChildren: () => import('./views/sign-up/sign-up.module')
       .then(m => m.SignUpModule)
   },
-  { path: 'compartilhamentos', loadChildren: () => import('./views/compartilhamentos/compartilhamentos.module').then(m => m.CompartilhamentosModule) }
+  {
+    path: 'compartilhamentos',
+    loadChildren: () => import('./views/compartilhamentos/compartilhamentos.module')
+      .then(m => m.CompartilhamentosModule)
+  }
 ];
 
 @NgModule({

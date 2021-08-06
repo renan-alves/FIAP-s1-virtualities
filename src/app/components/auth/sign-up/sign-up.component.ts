@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IUsers } from 'src/app/interfaces/users';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { UserssService } from 'src/app/services/users/users.service';
@@ -15,14 +15,16 @@ import { Router } from '@angular/router';
 export class SignUpFormComponent implements OnInit {
 
   registerError: string;
+  submited: boolean;
+  isGoogle: boolean;
 
   registerForm = new FormGroup({
-    name: new FormControl(''),
-    email: new FormControl(''),
-    country: new FormControl(''),
-    state: new FormControl(''),
-    birthday: new FormControl(''),
-    password: new FormControl('')
+    name: new FormControl('', Validators.required),
+    email: new FormControl('', Validators.required),
+    country: new FormControl('', Validators.required),
+    state: new FormControl('', Validators.required),
+    birthday: new FormControl('', Validators.required),
+    password: new FormControl('', Validators.required)
   })
 
   constructor(private authService: AuthService,
@@ -30,34 +32,63 @@ export class SignUpFormComponent implements OnInit {
     private modalService: NgbModal,
     private route: Router) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    if (this.authService.isLoggedIn) {
+      const user = this.authService.getCurrentUser;
+      this.usersService.exists$(user.uid).subscribe(exists => {
+        if (!exists) {
+          this.isGoogle = user.providerData[0].providerId === 'google.com';
+          this.registerForm.controls.email.disable();
+          this.registerForm.setValue({
+            name: user.displayName,
+            email: user.email,
+            country: '',
+            state: '',
+            birthday: '',
+            password: ''
+          });
+        }
+      });
+    }
+  }
 
-  register(content: TemplateRef<unknown>): void {
+  async register(content: TemplateRef<unknown>): Promise<void> {
+    this.submited = true;
+
     const email = this.registerForm.get('email').value;
     const password = this.registerForm.get('password').value;
 
-    this.authService.SignUp(email, password).then(result => {
-      result.user.sendEmailVerification();
+    const passwordHash = CryptoJS.AES.encrypt(password, 'p31xE').toString();
+    const [dia, mes, ano] = this.registerForm.get('birthday').value.split("/");
+    const birthday = new Date(ano, mes - 1, dia).getTime();
 
-      const passwordHash = CryptoJS.AES.encrypt(password, 'p31xE').toString();
-      const [dia, mes, ano] = this.registerForm.get('birthday').value.split("/");
-      const birthday = new Date(ano, mes - 1, dia).getTime();
+    let user: IUsers = {
+      ...this.registerForm.value,
+      password: passwordHash,
+      email,
+      birthday
+    }
 
-      const user: IUsers = {
-        ...this.registerForm.value,
-        uid: result.user.uid,
-        password: passwordHash,
-        birthday
-      };
+    if (this.isGoogle)
+      user.uid = this.authService.getCurrentUser.uid;
+    else
+      await this.authService.SignUp(email, password).then(result => {
+        result.user.sendEmailVerification();
 
-      this.usersService.create$(user).subscribe();
+        user.uid = result.user.uid;
 
-      this.modalService.open(content);
-    }).catch(error => {
+        this.modalService.open(content);
+      }).catch(error => {
+        if (error.code == 'auth/email-already-in-use')
+          this.registerError = 'E-mail já cadastrado!';
 
-      if (error.code == 'auth/email-already-in-use')
-        this.registerError = 'E-mail já cadastrado!';
-    });
+      });
+
+    console.log(user);
+
+    this.route.navigate(['/compartilhamentos']);
+
+    this.usersService.create$(user, user.uid).subscribe();
   }
 
   goToLogin(): void {

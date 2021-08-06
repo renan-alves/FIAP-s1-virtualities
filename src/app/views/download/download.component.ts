@@ -36,8 +36,6 @@ export class DownloadComponent implements OnInit {
   download(file: IFiles): void {
     this.invalidPassword = false;
 
-    console.log(file);
-
     if (!this.checkAvailability(file)) return;
 
     if (file.requirePassword)
@@ -45,14 +43,29 @@ export class DownloadComponent implements OnInit {
 
 
     this.afStorage.ref('/' + file.docId).listAll().subscribe(items => {
-      if (items.items.length > 0)
-        items.items[0].getDownloadURL().then(async url => {
-          const e = document.createElement('a');
-          e.href = url;
-          e.download = url.substr(url.lastIndexOf('/') + 1);
-          document.body.appendChild(e);
-          e.click();
-          document.body.removeChild(e);
+      if (items.items.length > 0) {
+
+        const url = items.items[0].getDownloadURL();
+        const metadata = items.items[0].getMetadata();
+
+        Promise.all([url, metadata]).then(async ([url, metadata]) => {
+
+          console.log(metadata);
+
+          const xhr = new XMLHttpRequest();
+          xhr.responseType = 'blob';
+          xhr.onload = (_event) => {
+            const blob = new Blob([xhr.response], { type: metadata.contentType });
+            const a: HTMLAnchorElement = document.createElement('a');
+            document.body.appendChild(a);
+            const url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = metadata.name;
+            a.click();
+            window.URL.revokeObjectURL(url);
+          };
+          xhr.open('GET', url);
+          xhr.send();
 
           this.file.downloadCount = this.file.downloadCount ? this.file.downloadCount + 1 : 1;
           this.filesService.update$(this.file, this.file.docId);
@@ -75,6 +88,7 @@ export class DownloadComponent implements OnInit {
               break;
           }
         })
+      }
       else console.error('Documento não existe');
     })
   }
@@ -84,7 +98,7 @@ export class DownloadComponent implements OnInit {
 
     if (!file.active)
       this.unavailableReason = 'Este arquivo não está mais disponível';
-    else if (file.downloadCount > file.downloadLimit)
+    else if (file.downloadCount >= file.downloadLimit)
       this.unavailableReason = 'Este link excedeu o limite de downloads';
     else if (currentDate > file.expirationDate) {
       this.unavailableReason = 'Este link expirou';

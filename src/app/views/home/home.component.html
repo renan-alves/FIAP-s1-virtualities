@@ -18,7 +18,7 @@
 
   <app-stepper [step]=step></app-stepper>
 
-  <button (click)="nextStep()" class="button primary" [disabled]="files.length == undefined || files.length == 0">
+  <button (click)="nextStep()" class="button primary" *ngIf="(files.length && files.length > 0) || step === 5">
     {{buttonText}}
   </button>
 </div>

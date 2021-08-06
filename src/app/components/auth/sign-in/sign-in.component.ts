@@ -18,10 +18,7 @@ export class SignInFormComponent implements OnInit {
   constructor(private authService: AuthService,
     private route: Router) { }
 
-  ngOnInit(): void {
-    if(this.authService.getCurrentUser.email)
-      this.email.setValue(this.authService.getCurrentUser.email);
-  }
+  ngOnInit(): void { }
 
   loginWithGoogle() {
     this.authService.GoogleAuth();
@@ -33,8 +30,10 @@ export class SignInFormComponent implements OnInit {
     
     this.authService.SignIn(email, password).then(result => {
 
+      console.log(result);
+
       if(result.user.emailVerified)
-        this.route.navigate(['/']);
+        this.route.navigate(['/compartilhamentos']);
       else 
         this.loginError = "E-mail não verificado!"
     }).catch(error => {

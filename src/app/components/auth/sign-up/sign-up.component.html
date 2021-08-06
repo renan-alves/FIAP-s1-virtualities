@@ -2,27 +2,35 @@
   <form [formGroup]="registerForm">
     <span>Cadastre-se</span>
     <div class="form-group">
-      <input type="text" formControlName="name" class="form-control" placeholder="Nome completo">
+      <input type="text" formControlName="name" class="form-control" placeholder="Nome completo"
+        [class.is-invalid]="submited && !registerForm.controls.name.valid">
     </div>
     <div class="form-group">
-      <input type="email" formControlName="email" class="form-control" placeholder="Email">
+      <input type="email" formControlName="email" class="form-control" placeholder="Email"
+        [class.is-invalid]="submited && !registerForm.controls.email.valid">
     </div>
     <div class="form-group">
-      <input type="text" formControlName="country" class="form-control" placeholder="País">
+      <input type="text" formControlName="country" class="form-control" placeholder="País"
+        [class.is-invalid]="submited && !registerForm.controls.country.valid">
     </div>
     <div class="form-group">
-      <input type="text" formControlName="state" class="form-control" placeholder="Estado">
+      <input type="text" formControlName="state" class="form-control" placeholder="Estado"
+        [class.is-invalid]="submited && !registerForm.controls.state.valid">
     </div>
     <div class="form-group">
-      <input type="text" formControlName="birthday" class="form-control" placeholder="Data de Nascimento">
+      <input type="text" formControlName="birthday" class="form-control" placeholder="Data de Nascimento"
+        [class.is-invalid]="submited && !registerForm.controls.birthday.valid">
     </div>
     <div class="form-group">
-      <input type="password" formControlName="password" class="form-control" placeholder="Senha">
+      <input type="password" formControlName="password" class="form-control" placeholder="Senha"
+        [class.is-invalid]="submited && !registerForm.controls.password.valid">
     </div>
     <p *ngIf="registerError"> {{registerError}} </p>
-    <button type="button" class="button primary" (click)="register(verification)">Cadastrar</button>
+    <button type="button" class="button primary" (click)="register(verification)">
+      {{ isGoogle ? "Avançar" : "Cadastrar" }}
+    </button>
 
-    <p><a href="/login">Já tenho uma conta. Entrar</a></p>
+    <p *ngIf="!isGoogle"><a href="/login">Já tenho uma conta. Entrar</a></p>
   </form>
 </div>
 

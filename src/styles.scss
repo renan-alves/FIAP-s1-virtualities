@@ -11,27 +11,31 @@ body {
 .button {
   display: flex;
   justify-content: center;
-  border-radius: 100px;
+  border-radius: 10px;
   border: 0;
   padding: 10px 40px;
   font-size: 18px;
   white-space: nowrap;
-  -webkit-transition-duration: 0.4s; /* Safari */
+  -webkit-transition-duration: 0.4s;
+  /* Safari */
   transition-duration: 0.5s;
 
   &.primary {
     color: white;
     background-color: #076FBB;
+
+    &:hover {
+      background: darken(#076FBB, 7%);
+    }
   }
 
   &.secondary {
-    color: black;
+    color: #076FBB;
     background-color: #E0E0E0;
+
+    &:hover {
+      background: darken(#E0E0E0, 10%);
+    }
   }
 
-  &:after,
-  &:hover {
-    opacity: .5;
-    transition: all;
-  }
 }

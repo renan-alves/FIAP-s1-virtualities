@@ -19,7 +19,6 @@ export class AuthService {
     private route: Router
   ) {
     this.afAuth.authState.subscribe(user => {
-      console.log(user);
       if (user) {
         this.userData = user;
         localStorage.setItem('user', JSON.stringify(this.userData));
@@ -45,7 +44,7 @@ export class AuthService {
 
   get isLoggedIn(): boolean {
     const user = JSON.parse(localStorage.getItem('user'));
-    return (user !== null) ? true : false; // && user.emailVerified !== false
+    return (user !== null && user.emailVerified !== false) ? true : false
   }
 
   get getCurrentUser(): firebase.User {
@@ -61,7 +60,7 @@ export class AuthService {
       this.usersService.exists$(result.user.uid).subscribe(user => {
         console.log(user);
         if (user)
-          this.route.navigate(['/']);
+          this.route.navigate(['/compartilhamentos']);
         else
           this.route.navigate(['/register']);
       })
