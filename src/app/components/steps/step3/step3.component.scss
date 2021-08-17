@@ -1,26 +1,43 @@
+.form-progress-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.name {
+  white-space: nowrap;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+}
+
 .form {
   display: flex;
   flex-direction: column;
   padding: 22px;
+  align-items: center;
 
-  .checkbox {
+  a {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    margin-bottom: 10px;
-
-    span {
-      font-size: 14px;
-    }
-
-    input {
-      height: 25px;
-      width: 25px;
-    }
   }
 
-  p {
-    color: white;
-    width: 100%;
+  .input {
+    margin-bottom: 10px;
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: auto;
+    background-repeat: no-repeat;
+
+    &.icon-qr {
+      width: 32px;
+      height: 32px;
+      background-image: url(~src/assets/icons/qr-code.svg);
+    }
   }
 }

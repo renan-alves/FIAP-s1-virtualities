@@ -1,5 +1,6 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { forkJoin, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-step3',
@@ -7,18 +8,19 @@ import { FormControl } from '@angular/forms';
   styleUrls: ['./step3.component.scss']
 })
 export class Step3Component implements OnInit, OnDestroy {
-  @Output() anonymousCallback: EventEmitter<{allowAnonymous: boolean}> = new EventEmitter();
 
-  allowAnonymous = new FormControl(true);
+  @Input('progress') progress: { file: File, progress: Observable<number> }[];
+  @Input('uploaded') uploaded: boolean;
+  @Input('id') id: boolean;
+  @Input('expireIn') expireIn: number;
+
+  link = new FormControl();
 
   constructor() { }
   ngOnDestroy(): void {
-    this.anonymousCallback.emit({
-      allowAnonymous: this.allowAnonymous.value
-    })
   }
 
   ngOnInit(): void {
+    this.link.setValue(window.location.href + 'download/' + this.id);
   }
-
 }

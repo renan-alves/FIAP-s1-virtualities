@@ -12,6 +12,9 @@ export class Step1Component implements OnInit {
 
   @Output() fileCallback: EventEmitter<File> = new EventEmitter();
 
+  freePlanSize = 5368709120
+  leftSize: string;
+
   constructor() { }
 
   ngOnInit(): void {
@@ -25,25 +28,24 @@ export class Step1Component implements OnInit {
     Object.values(event.target.files).forEach(file => {
       this.fileCallback.emit(file)
     });
+    this.getLeftSize();
   }
 
-  humanFileSize(bytes: number, dp = 1) {
-    const thresh = 1024;
+  humanFileSize(bytes: number) {
 
-    if (Math.abs(bytes) < thresh) {
-      return bytes + ' B';
+
+    var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    var i = 0;
+    while (bytes >= 1024) {
+      bytes /= 1024;
+      ++i;
     }
+    return Math.floor(bytes * 100) / 100 + ' ' + units[i];
+  }
 
-    const units = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    let u = -1;
-    const r = 10 ** dp;
-
-    do {
-      bytes /= thresh;
-      ++u;
-    } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1);
-
-    return bytes.toFixed(dp) + ' ' + units[u];
+  getLeftSize() {
+    const totalSize = this.files.reduce((acc, curr) => acc + curr.size, 0);
+    this.leftSize = this.humanFileSize(this.freePlanSize - totalSize);
   }
 
   removeFile(index: number) {

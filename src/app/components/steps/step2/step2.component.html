@@ -1,11 +1,20 @@
 <div class="form">
+  <div class="form-group mb-2">
+    <label>Expirar em:</label>
+    <input type="date" [formControl]="expirationDate" class="form-control" />
+  </div>
+  <div class="form-group mb-4">
+    <input type="number" [formControl]="downloadLimit" class="form-control" placeholder="Limites de download" />
+  </div>
   <div class="checkbox">
     <span>Proteger com senha</span>
     <input type="checkbox" [formControl]="requirePassword" (change)="toggleForm()" class="form-check-input" />
   </div>
   <div class="input">
-    <input type="password" [formControl]="password"
-      class="form-control" placeholder="Defina sua senha" />
+    <input type="password" [formControl]="password" class="form-control" placeholder="Defina sua senha" />
   </div>
-  <button (click)="generateRandomPassword()" class="button secondary" [disabled]="toggle"> Gerar senha aleatória </button>
+  <div class="d-flex flex-column align-items-center">
+    <span>7 dias | 10 downloads</span>
+    <span>Protegido com senha</span>
+  </div>
 </div>

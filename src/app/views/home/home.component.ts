@@ -21,7 +21,8 @@ export class HomeComponent implements OnInit {
   step: number = 1;
   buttonText: string = 'Ok, próximo';
   stepMessages: string[];
-  progress$: Observable<number>;
+  progress: { file: File, progress: Observable<number> }[] = [];
+  uploadStatus: boolean[] = [];
   uploaded: boolean;
   id: string;
 
@@ -30,6 +31,8 @@ export class HomeComponent implements OnInit {
   isAnonymous: boolean;
   downloadLimit: number;
   expirationDate: number;
+
+  totalTransferred: number;
 
   constructor(
     private afStorage: AngularFireStorage,
@@ -61,7 +64,6 @@ export class HomeComponent implements OnInit {
       docId,
       downloadLimit: this.downloadLimit,
       expirationDate: this.expirationDate,
-      isAnonymous: this.isAnonymous,
       requirePassword: this.requirePassword
     }
 
@@ -74,32 +76,20 @@ export class HomeComponent implements OnInit {
   }
 
   async uploadFiles(filename: string): Promise<void> {
-    let fileToUpload: File;
-    let path: string;
-    if (this.files.length > 1) {
-      let zip = new JSZip();
+    for (const file of this.files) {
+      const path = '/' + filename + '/' + file.name;
 
-      for (let file of this.files) {
-        let filename = file.name
-        zip.file(filename, file)
-      }
+      const task = this.afStorage.upload(path, file);
+      task.snapshotChanges().subscribe(snap => {
+        if (snap.state === 'success')
+          this.uploadStatus.push(true);
 
-      const date = new Date();
-      const zipName = date.toLocaleDateString().replace(/\//g, '-');
-
-      await zip.generateAsync({ type: 'blob' }).then((blobdata) => {
-        fileToUpload = new File([blobdata], 'segue-' + zipName + '.zip');
-        path = '/' + filename + '/' + fileToUpload.name;
+        if (this.files.length === this.uploadStatus.length)
+          this.uploaded = true;
       });
+      
+      this.progress.push({ file, progress: task.percentageChanges() });
     }
-    else {
-      fileToUpload = this.files[0];
-      path = '/' + filename + '/' + fileToUpload.name;
-    }
-
-    const task = this.afStorage.upload(path, fileToUpload);
-    this.progress$ = task.percentageChanges();
-    task.then(() => this.uploaded = true)
   }
 
   nextStep() {
@@ -107,11 +97,9 @@ export class HomeComponent implements OnInit {
     this.step++;
     switch (this.step) {
       case 1: this.buttonText = 'Ok, próximo'; break;
-      case 2: this.buttonText = 'Próximo'; break;
-      case 3: this.buttonText = 'Próximo'; break;
-      case 4: this.buttonText = 'Criar link'; break;
+      case 2: this.buttonText = 'Criar link'; break;
+      case 3: this.buttonText = 'Copiar link'; break;
     }
-
   }
 
   handleStep1(file: File): void {
@@ -119,18 +107,11 @@ export class HomeComponent implements OnInit {
     this.active = false;
   }
 
-  handleStep2(password: { requirePassword: boolean, password: string }) {
-    this.password = password.password;
-    this.requirePassword = password.requirePassword;
-  }
-
-  handleStep3(allowAnonymous: { allowAnonymous: boolean }) {
-    this.isAnonymous = allowAnonymous.allowAnonymous;
-  }
-
-  handleStep4(limit: { expirationDate: number, downloadLimit: number }) {
-    this.expirationDate = limit.expirationDate;
-    this.downloadLimit = limit.downloadLimit;
+  handleStep2(security: { requirePassword: boolean, password: string, expirationDate: number, downloadLimit: number }) {
+    this.password = security.password;
+    this.requirePassword = security.requirePassword;
+    this.expirationDate = security.expirationDate;
+    this.downloadLimit = security.downloadLimit;
 
     this.generateLink();
   }

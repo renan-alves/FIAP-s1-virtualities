@@ -1,10 +1,17 @@
-<div class="form">
-	<div class="checkbox">
-		<span>Permitir download anônimo</span>
-		<input type="checkbox" [formControl]="allowAnonymous" class="form-check-input" />
-	</div>
-	<p>
-		Permitindo o download anônimo você não será capaz de identificar os usuários que baixaram seus arquivos.
-		É preciso um plano <b>Segue Pro</b> para coletar dados relativos aos downloads.
-	</p>
+<div *ngIf="!uploaded" class="form-progress-bar">
+  Fazendo o upload:
+  <div *ngFor="let item of progress">
+    <div class="name">{{item.file.name}}</div>
+    <ngb-progressbar [showValue]="true" [value]="(item.progress | async)"></ngb-progressbar>
+  </div>
+</div>
+<div *ngIf="uploaded" class="form">
+  <div class="input">
+    <input type="text" [formControl]="link" class="form-control" />
+  </div>
+  <p>Seu arquivo expirará em: {{expireIn | date:'dd/MM/yyyy':'UTC'}}</p>
+  <a>
+    <span class="icon icon-qr"></span>
+    <span>Gerar QR Code</span>
+  </a>
 </div>

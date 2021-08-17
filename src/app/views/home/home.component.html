@@ -11,8 +11,6 @@
       <ng-container *ngSwitchCase="1" [ngTemplateOutlet]="step1"></ng-container>
       <ng-container *ngSwitchCase="2" [ngTemplateOutlet]="step2"></ng-container>
       <ng-container *ngSwitchCase="3" [ngTemplateOutlet]="step3"></ng-container>
-      <ng-container *ngSwitchCase="4" [ngTemplateOutlet]="step4"></ng-container>
-      <ng-container *ngSwitchCase="5" [ngTemplateOutlet]="step5"></ng-container>
     </ng-container>
   </div>
 
@@ -30,17 +28,9 @@
 </ng-template>
 
 <ng-template #step2>
-  <app-step2 (passwordCallback)="handleStep2($event)"></app-step2>
+  <app-step2 (securityCallback)="handleStep2($event)"></app-step2>
 </ng-template>
 
 <ng-template #step3>
-  <app-step3 (anonymousCallback)="handleStep3($event)"></app-step3>
-</ng-template>
-
-<ng-template #step4>
-  <app-step4 (limitCallback)="handleStep4($event)"></app-step4>
-</ng-template>
-
-<ng-template #step5>
-   <app-step5 [progress$]="progress$" [uploaded]="uploaded" [id]="id" [expireIn]="expirationDate"></app-step5>
+  <app-step3 [progress]="progress" [uploaded]="uploaded" [id]="id" [expireIn]="expirationDate"></app-step3>
 </ng-template>

@@ -7,33 +7,39 @@ import { FormControl } from '@angular/forms';
   styleUrls: ['./step2.component.scss']
 })
 export class Step2Component implements OnInit, OnDestroy {
-  @Output() passwordCallback: EventEmitter<{requirePassword: boolean, password: string}> = new EventEmitter();
+  @Output() securityCallback: EventEmitter<{
+    requirePassword: boolean,
+    password: string,
+    expirationDate: number,
+    downloadLimit: number
+  }> = new EventEmitter();
 
   password = new FormControl('');
   requirePassword = new FormControl(true);
+  expirationDate = new FormControl();
+  downloadLimit = new FormControl();
 
   toggle: boolean;
 
   constructor() { }
 
   ngOnDestroy(): void {
-    this.passwordCallback.emit({
+    this.securityCallback.emit({
       requirePassword: this.requirePassword.value,
-      password: this.password.value
+      password: this.password.value,
+      expirationDate: Date.parse(this.expirationDate.value),
+      downloadLimit: this.downloadLimit.value
     });
   }
 
   ngOnInit(): void {
   }
 
-  generateRandomPassword(): void { }
-
   toggleForm(): void {
     this.toggle = !this.toggle;
-    if(this.toggle) 
+    if (this.toggle)
       this.password.disable();
-    else 
+    else
       this.password.enable();
   }
-
 }
