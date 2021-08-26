@@ -4,6 +4,7 @@
     <input type="date" [formControl]="expirationDate" class="form-control" />
   </div>
   <div class="form-group mb-4">
+    <label>Limites de downloads:</label>
     <input type="number" [formControl]="downloadLimit" class="form-control" placeholder="Limites de download" />
   </div>
   <div class="checkbox">
@@ -13,8 +14,10 @@
   <div class="input">
     <input type="password" [formControl]="password" class="form-control" placeholder="Defina sua senha" />
   </div>
-  <div class="d-flex flex-column align-items-center">
-    <span>7 dias | 10 downloads</span>
+  <div *ngIf="expirationDate.value && downloadLimit.value" class="d-flex flex-column align-items-center">
+    <span>{{ expirationDate.value | date:'dd/MM/yyyy':'UTC'}} | {{ downloadLimit.value }} downloads</span>
+  </div>
+  <div *ngIf="requirePassword.value == true" class="d-flex flex-column align-items-center">
     <span>Protegido com senha</span>
   </div>
 </div>

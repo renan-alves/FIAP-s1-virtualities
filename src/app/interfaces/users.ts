@@ -1,9 +1,17 @@
-export interface IUsers {
-  uid: string;
+export type IUser = IUserBase & {
   name: string;
   email: string;
-  country: string;
-  state: string;
-  birthday: number;
   password: string;
+}
+
+export type IUserAnonymous = IUserBase & {
+  fingerprint: string;
+}
+
+type IUserBase = {
+  uid: string;
+  planId?: string;
+  uploads?: number;
+  storage?: number;
+  isAnonymous: boolean;
 }

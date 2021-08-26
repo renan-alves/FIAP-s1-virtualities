@@ -10,18 +10,6 @@
         [class.is-invalid]="submited && !registerForm.controls.email.valid">
     </div>
     <div class="form-group">
-      <input type="text" formControlName="country" class="form-control" placeholder="País"
-        [class.is-invalid]="submited && !registerForm.controls.country.valid">
-    </div>
-    <div class="form-group">
-      <input type="text" formControlName="state" class="form-control" placeholder="Estado"
-        [class.is-invalid]="submited && !registerForm.controls.state.valid">
-    </div>
-    <div class="form-group">
-      <input type="text" formControlName="birthday" class="form-control" placeholder="Data de Nascimento"
-        [class.is-invalid]="submited && !registerForm.controls.birthday.valid">
-    </div>
-    <div class="form-group">
       <input type="password" formControlName="password" class="form-control" placeholder="Senha"
         [class.is-invalid]="submited && !registerForm.controls.password.valid">
     </div>
@@ -38,6 +26,6 @@
   <div class="p-4">
     <p>Um e-mail de verificação foi enviado para {{ registerForm.get('email').value }}</p>
     <p>Siga as orientações para validar seu cadastro</p>
-    <button type="button" class="button primary" (click)="goToLogin()">Próximo</button>
+    <button type="button" class="button primary" (click)="goToLogin()">OK</button>
   </div>
 </ng-template>

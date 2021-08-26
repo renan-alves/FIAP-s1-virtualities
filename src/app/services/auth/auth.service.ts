@@ -3,8 +3,8 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import firebase from 'firebase';
-import { IUsers } from 'src/app/interfaces/users';
-import { UserssService } from '../users/users.service';
+import { IUser } from 'src/app/interfaces/users';
+import { UserService } from '../users/users.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,6 @@ export class AuthService {
 
   constructor(
     private afAuth: AngularFireAuth,
-    private usersService: UserssService,
     private route: Router
   ) {
     this.afAuth.authState.subscribe(user => {
@@ -32,6 +31,10 @@ export class AuthService {
 
   SignIn(email: string, senha: string): Promise<firebase.auth.UserCredential> {
     return this.afAuth.signInWithEmailAndPassword(email, senha);
+  }
+
+  SignInAnonymous(): Promise<firebase.auth.UserCredential> {
+    return this.afAuth.signInAnonymously()
   }
 
   SignUp(email: string, senha: string): Promise<firebase.auth.UserCredential> {
@@ -56,20 +59,13 @@ export class AuthService {
   }
 
   AuthLogin(provider: firebase.auth.AuthProvider) {
-    this.afAuth.signInWithPopup(provider).then(result => {
-      this.usersService.exists$(result.user.uid).subscribe(user => {
-        console.log(user);
-        if (user)
-          this.route.navigate(['/compartilhamentos']);
-        else
-          this.route.navigate(['/register']);
-      })
+    this.afAuth.signInWithPopup(provider).then(() => {
+      this.route.navigate(['/']);
     })
   }
 
-  SignOut(): Promise<void> {
-    return this.afAuth.signOut().then(() => {
-      localStorage.removeItem('user');
-    })
+  async SignOut(): Promise<void> {
+    await this.afAuth.signOut();
+    localStorage.removeItem('user');
   }
 }

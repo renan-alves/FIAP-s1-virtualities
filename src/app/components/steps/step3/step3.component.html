@@ -6,9 +6,7 @@
   </div>
 </div>
 <div *ngIf="uploaded" class="form">
-  <div class="input">
-    <input type="text" [formControl]="link" class="form-control" />
-  </div>
+  <div class="link" [innerHTML]="link"></div>
   <p>Seu arquivo expirará em: {{expireIn | date:'dd/MM/yyyy':'UTC'}}</p>
   <a>
     <span class="icon icon-qr"></span>

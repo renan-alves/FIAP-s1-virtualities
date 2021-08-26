@@ -27,14 +27,11 @@ export class SignInFormComponent implements OnInit {
   login(): void {
     const email = this.email.value;
     const password = this.password.value;
-    
+
     this.authService.SignIn(email, password).then(result => {
-
-      console.log(result);
-
-      if(result.user.emailVerified)
-        this.route.navigate(['/compartilhamentos']);
-      else 
+      if (result.user.emailVerified)
+        this.route.navigate(['/']);
+      else
         this.loginError = "E-mail não verificado!"
     }).catch(error => {
       if (error.code == 'auth/wrong-password') {

@@ -15,5 +15,6 @@
   </div>
 </div>
 <div class="limit" *ngIf="files.length > 0">
-  {{leftSize}} restantes
+  <p *ngIf="!error">{{leftSize}} restantes</p>
+  <p *ngIf="error" class="error">{{leftSize}} excedidos</p>
 </div>

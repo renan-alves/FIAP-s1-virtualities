@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@angular/core';
-import { IUser } from 'src/app/interfaces/users';
+import { IUserAnonymous } from 'src/app/interfaces/users';
 import { BaseService } from '../base/base.service';
 import { FireService } from '../base/fire.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserService extends BaseService<IUser>{
+export class AnonymousUserService extends BaseService<IUserAnonymous>{
   protected basePath: string = 'users';
 
   constructor(

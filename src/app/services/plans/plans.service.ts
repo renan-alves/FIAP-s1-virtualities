@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@angular/core';
-import { IUser } from 'src/app/interfaces/users';
+import { IPlan } from 'src/app/interfaces/plan';
 import { BaseService } from '../base/base.service';
 import { FireService } from '../base/fire.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserService extends BaseService<IUser>{
-  protected basePath: string = 'users';
+export class PlansService extends BaseService<IPlan>{
+  protected basePath: string = 'plans';
 
   constructor(
     @Inject(FireService) protected fireService: FireService) {

@@ -14,13 +14,13 @@ export class Step3Component implements OnInit, OnDestroy {
   @Input('id') id: boolean;
   @Input('expireIn') expireIn: number;
 
-  link = new FormControl();
+  link: string;
 
   constructor() { }
   ngOnDestroy(): void {
   }
 
   ngOnInit(): void {
-    this.link.setValue(window.location.href + 'download/' + this.id);
+    this.link = window.location.href + 'download/' + this.id
   }
 }

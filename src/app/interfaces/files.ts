@@ -1,4 +1,4 @@
-export interface IFiles {
+export interface IFile {
   active: boolean;
   docId: string;
   dateCreated: number;
@@ -8,4 +8,5 @@ export interface IFiles {
   expirationDate: number;
   password?: string;
   requirePassword: boolean;
+  userId?: string;
 }

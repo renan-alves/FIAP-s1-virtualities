@@ -2,9 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { IFiles } from 'src/app/interfaces/files';
+import { IFile } from 'src/app/interfaces/files';
 import { FilessService } from 'src/app/services/files/files.service';
 import CryptoJS from 'crypto-js';
+import JSZip from 'jszip';
+import { ListResult, Reference } from '@angular/fire/storage/interfaces';
 
 @Component({
   selector: 'app-download',
@@ -13,7 +15,7 @@ import CryptoJS from 'crypto-js';
 })
 export class DownloadComponent implements OnInit {
 
-  file: IFiles;
+  file: IFile;
   unavailableReason: string;
   downloaded: boolean;
 
@@ -32,7 +34,66 @@ export class DownloadComponent implements OnInit {
     }, (_error) => this.unavailableReason = 'Arquivo não existe')
   }
 
-  download(file: IFiles): void {
+  downloadSingleFile(item: Reference): void {
+    const url = item.getDownloadURL();
+    const metadata = item.getMetadata();
+
+    Promise.all([url, metadata]).then(async ([url, metadata]) => {
+      const xhr = new XMLHttpRequest();
+      xhr.responseType = 'blob';
+      xhr.onload = (_event) => {
+        const blob = new Blob([xhr.response], { type: metadata.contentType });
+        const a: HTMLAnchorElement = document.createElement('a');
+        document.body.appendChild(a);
+        const url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = metadata.name;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      };
+      xhr.open('GET', url);
+      xhr.send();
+    })
+  }
+
+  async downloadMultipleFiles(items: ListResult): Promise<void> {
+    const zip = new JSZip();
+
+    const promises = items.items.map(item => Promise.all([
+      item.getDownloadURL(),
+      item.getMetadata()
+    ]));
+
+    const datas = [];
+
+    for (const promise of promises) {
+      await promise.then(data => datas.push(data));
+    }
+
+    for (const [url, metadata] of datas) {
+      const response = await fetch(url);
+      const data = await response.blob();
+      const mime = {
+        type: metadata.contentType
+      };
+      zip.file(metadata.name, new File([data], metadata.name, mime));
+    }
+
+    const date = new Date();
+    const zipName = 'segue-' + date.toLocaleDateString().replace(/\//g, '-') + '.zip';
+
+    await zip.generateAsync({ type: 'blob' }).then((blobdata) => {
+      const a: HTMLAnchorElement = document.createElement('a');
+      document.body.appendChild(a);
+      const url = window.URL.createObjectURL(new File([blobdata], zipName));
+      a.href = url;
+      a.download = zipName;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
+  }
+
+  download(file: IFile): void {
     this.invalidPassword = false;
 
     if (!this.checkAvailability(file)) return;
@@ -40,59 +101,22 @@ export class DownloadComponent implements OnInit {
     if (file.requirePassword)
       if (!this.checkPassword()) return;
 
+    this.afStorage.ref('/' + file.docId).listAll().subscribe(async items => {
 
-    this.afStorage.ref('/' + file.docId).listAll().subscribe(items => {
-      if (items.items.length > 0) {
+      if (items.items.length === 1)
+        this.downloadSingleFile(items.items[0])
+      else
+        this.downloadMultipleFiles(items)
 
-        const url = items.items[0].getDownloadURL();
-        const metadata = items.items[0].getMetadata();
+      this.file.downloadCount = this.file.downloadCount ? this.file.downloadCount + 1 : 1;
+      this.filesService.update$(this.file, this.file.docId);
 
-        Promise.all([url, metadata]).then(async ([url, metadata]) => {
-
-          console.log(metadata);
-
-          const xhr = new XMLHttpRequest();
-          xhr.responseType = 'blob';
-          xhr.onload = (_event) => {
-            const blob = new Blob([xhr.response], { type: metadata.contentType });
-            const a: HTMLAnchorElement = document.createElement('a');
-            document.body.appendChild(a);
-            const url = window.URL.createObjectURL(blob);
-            a.href = url;
-            a.download = metadata.name;
-            a.click();
-            window.URL.revokeObjectURL(url);
-          };
-          xhr.open('GET', url);
-          xhr.send();
-
-          this.file.downloadCount = this.file.downloadCount ? this.file.downloadCount + 1 : 1;
-          this.filesService.update$(this.file, this.file.docId);
-
-          this.downloaded = true;
-          this.file = null;
-        }).catch(error => {
-          switch (error.code) {
-            case 'storage/object-not-found':
-              console.error("File doesn't exist");
-              break;
-            case 'storage/unauthorized':
-              console.error("User doesn't have permission to access the object")
-              break;
-            case 'storage/canceled':
-              console.error("User canceled the upload")
-              break;
-            case 'storage/unknown':
-              console.error("Unknown error occurred, inspect the server response")
-              break;
-          }
-        })
-      }
-      else console.error('Documento não existe');
+      this.downloaded = true;
+      this.file = null;
     })
   }
 
-  checkAvailability(file: IFiles): boolean {
+  checkAvailability(file: IFile): boolean {
     const currentDate = Date.now();
 
     if (!file.active)

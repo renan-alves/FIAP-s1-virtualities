@@ -6,7 +6,7 @@
     Pode soltar!
   </span>
 
-  <div class="box" [class.expandable]="files.length > 0">
+  <div class="box" [class.expandable]="files.length > 0" [class.resume]="step == 3 && uploaded">
     <ng-container [ngSwitch]="step">
       <ng-container *ngSwitchCase="1" [ngTemplateOutlet]="step1"></ng-container>
       <ng-container *ngSwitchCase="2" [ngTemplateOutlet]="step2"></ng-container>
@@ -14,9 +14,13 @@
     </ng-container>
   </div>
 
-  <app-stepper [step]=step></app-stepper>
+  <app-stepper *ngIf="step < 3" [step]=step></app-stepper>
 
-  <button (click)="nextStep()" class="button primary" *ngIf="(files.length && files.length > 0) || step === 5">
+  <div *ngIf="errorMessage" class="box text-center mb-2">
+    {{errorMessage}}
+  </div>
+
+  <button (click)="nextStep()" class="button primary" [disabled]="errorMessage" *ngIf="(files.length && files.length > 0) || step === 3">
     {{buttonText}}
   </button>
 </div>
@@ -24,11 +28,11 @@
 <div class="dropzone" [ngStyle]="{'z-index':active ? 9 : -9 }"></div>
 
 <ng-template #step1>
-  <app-step1 [files]="files" (fileCallback)="handleStep1($event)"></app-step1>
+  <app-step1 [files]="files" [plan]="plan" [user]="user" (fileCallback)="handleStep1($event)" (errorCallback)="handleStepsErros($event)"></app-step1>
 </ng-template>
 
 <ng-template #step2>
-  <app-step2 (securityCallback)="handleStep2($event)"></app-step2>
+  <app-step2 [plan]="plan" (securityCallback)="handleStep2($event)"></app-step2>
 </ng-template>
 
 <ng-template #step3>
