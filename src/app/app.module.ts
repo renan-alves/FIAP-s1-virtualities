@@ -13,6 +13,7 @@ import { AuthService } from './services/auth/auth.service';
 import { CommonModule, DatePipe } from '@angular/common';
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { FooterComponent } from './components/footer/footer.component';
     AngularFirestoreModule,
     AngularFireStorageModule,
     AngularFireFunctionsModule,
-    AngularFireAuthModule
+    AngularFireAuthModule,
+    FontAwesomeModule
   ],
   providers: [
     { provide: REGION, useValue: 'southamerica-east1' },
