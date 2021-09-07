@@ -17,6 +17,7 @@ import { AnonymousUserService } from 'src/app/services/users/userAnonymous.servi
 import firebase from 'firebase';
 import { Step1Component } from 'src/app/components/steps/step1/step1.component';
 import { FireService } from 'src/app/services/base/fire.service';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-home',
@@ -55,15 +56,18 @@ export class HomeComponent implements OnInit {
     private filesService: FilessService,
     private config: NgbProgressbarConfig,
     private authService: AuthService,
+    private afAuth: AngularFireAuth,
     private userService: UserService,
     private anonymousUserService: AnonymousUserService,
     private planService: PlansService) {
+    this.afAuth.authState.subscribe(user => {
+      if (user) this.getUserInfo(user)
+    })
   }
 
   ngOnInit(): void {
     this.stepMessages = stepMessages.messages;
     this.initProgressbarConfig();
-    this.getUserInfo();
   }
 
   initProgressbarConfig(): void {
@@ -74,8 +78,11 @@ export class HomeComponent implements OnInit {
     this.config.height = '20px';
   }
 
-  async getUserInfo(): Promise<void> {
+  async getUserInfo(fireUser?: firebase.User): Promise<void> {
     const user = this.authService.getCurrentUser;
+
+    if (fireUser?.uid !== user.uid)
+      window.location.reload();
 
     if (user === null) {
       this.fingerprint = await this.getBrowserFingerprint();
@@ -149,7 +156,8 @@ export class HomeComponent implements OnInit {
       uid: user.user.uid,
       planId: 'ANONYMOUS',
       storage: this.files.reduce((acc, curr) => acc + curr.size, 0),
-      uploads: 1
+      uploads: 1,
+      dateCreated: Date.now()
     }
 
     this.anonymousUserService.create$(anonymousUser, anonymousUser.uid);

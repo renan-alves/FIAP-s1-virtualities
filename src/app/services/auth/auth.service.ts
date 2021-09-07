@@ -1,9 +1,11 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable, NgZone, ViewChild } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import firebase from 'firebase';
-import { IUser } from 'src/app/interfaces/users';
+import { IUser, IUserProvider } from 'src/app/interfaces/users';
+import { HomeComponent } from 'src/app/views/home/home.component';
+import { UserProviderService } from '../users/userProvider.service';
 import { UserService } from '../users/users.service';
 
 @Injectable({
@@ -15,7 +17,8 @@ export class AuthService {
 
   constructor(
     private afAuth: AngularFireAuth,
-    private route: Router
+    private route: Router,
+    private userProviderService: UserProviderService
   ) {
     this.afAuth.authState.subscribe(user => {
       if (user) {
@@ -54,12 +57,27 @@ export class AuthService {
     return JSON.parse(localStorage.getItem('user'));
   }
 
-  GoogleAuth() {
+  GoogleAuth(): void {
     this.AuthLogin(new firebase.auth.GoogleAuthProvider());
   }
 
   AuthLogin(provider: firebase.auth.AuthProvider) {
-    this.afAuth.signInWithPopup(provider).then(() => {
+    this.afAuth.signInWithPopup(provider).then((credential) => {
+      const userProvider: IUserProvider = {
+        dateCreated: Date.now(),
+        email: credential.user.email,
+        isAnonymous: false,
+        name: credential.user.displayName,
+        provider: provider.providerId,
+        uid: credential.user.uid,
+        photoUrl: credential.user.photoURL,
+        planId: 'FREE',
+        storage: 0,
+        uploads: 0
+      }
+
+      this.userProviderService.create$(userProvider, userProvider.uid);
+
       this.route.navigate(['/']);
     })
   }
