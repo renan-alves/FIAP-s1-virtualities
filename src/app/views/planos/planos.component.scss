@@ -1,0 +1,49 @@
+.planos {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 160px);
+  align-items: center;
+  justify-content: center;
+  color: white;
+
+  .box {
+    background-color: rgba($color: #000000, $alpha: .7);
+    padding: 3em;
+    width: 430px;
+    height: 100%;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+}
+
+.card_title {
+  font-weight: normal;
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.pricing {
+  font-weight: normal;
+  font-size: 96px;
+}
+.pricing .small {
+  font-size: 16px;
+}
+
+
+a.cta_btn {
+  width: 100%;
+  display: inline-block;
+  text-align: center;
+  background: rgba(21, 23, 24, 0.7);
+  border-radius: 29px;
+  padding: 20px 0;
+  color: white;
+  text-decoration: none;
+  letter-spacing: 2px;
+  transition: background .3s ease;
+}
+
+a.cta_btn:hover {
+  background: #000;
+}

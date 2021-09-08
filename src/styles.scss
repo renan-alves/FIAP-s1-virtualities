@@ -8,6 +8,14 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
+body.home {
+  background-image: url(assets/backgrounds/background-1.png);
+}
+
+body.planos {
+  background-image: url(assets/backgrounds/background-planos.png);
+}
+
 .button {
   display: flex;
   justify-content: center;
@@ -38,7 +46,4 @@ body {
     }
   }
 
-  &:disabled {
-    opacity: 0.5;
-  }
 }

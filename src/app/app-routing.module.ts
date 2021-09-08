@@ -21,7 +21,8 @@ const routes: Routes = [
     path: 'register',
     loadChildren: () => import('./views/sign-up/sign-up.module')
       .then(m => m.SignUpModule)
-  }
+  },
+  { path: 'planos', loadChildren: () => import('./views/planos/planos.module').then(m => m.PlanosModule), data: { bodyClass: 'planos' } }
 ];
 
 @NgModule({
