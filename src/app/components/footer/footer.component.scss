@@ -29,14 +29,19 @@
 	}
 
   .info {
+    display: flex;
+    align-items: center;
+
     ul {
       list-style-type: none;
-      color: white;
+      margin: 0;
 
       li a {
+        color: white;
         font-size: 14px;
         font-weight: 400;
         cursor: pointer;
+        text-decoration: none;
 
         &:hover {
           text-decoration: underline;
@@ -44,5 +49,4 @@
       }
     }
   }
-
 }

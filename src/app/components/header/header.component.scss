@@ -1,7 +1,8 @@
 .header {
   display: flex;
   justify-content: space-between;
-  position: relative;
+  width: 100%;
+  position: fixed;
   
   a {
     text-decoration: none;
@@ -84,4 +85,8 @@
       }
     }
   }
+}
+
+.space {
+  height: 60px;
 }

@@ -22,7 +22,26 @@ const routes: Routes = [
     loadChildren: () => import('./views/sign-up/sign-up.module')
       .then(m => m.SignUpModule)
   },
-  { path: 'planos', loadChildren: () => import('./views/planos/planos.module').then(m => m.PlanosModule), data: { bodyClass: 'planos' } }
+  {
+    path: 'planos',
+    loadChildren: () => import('./views/planos/planos.module')
+      .then(m => m.PlanosModule), data: { bodyClass: 'planos' }
+  },
+  {
+    path: 'contato',
+    loadChildren: () => import('./views/contact/contact.module')
+      .then(m => m.ContactModule)
+  },
+  {
+    path: 'termos-de-uso',
+    loadChildren: () => import('./views/terms-of-use/terms-of-use.module')
+      .then(m => m.TermsOfUseModule)
+  },
+  {
+    path: 'politica-de-privacidade',
+    loadChildren: () => import('./views/privacy-policy/privacy-policy.module')
+      .then(m => m.PrivacyPolicyModule)
+  }
 ];
 
 @NgModule({

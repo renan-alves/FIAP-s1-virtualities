@@ -3,9 +3,9 @@
   <div class="d-none d-md-flex menu">
     <ul>
       <li><a href="/planos">Planos</a></li>&nbsp;|&nbsp;
-      <li><a>Sobre Nós</a></li>&nbsp;|&nbsp;
-      <li><a>Ajuda</a></li>&nbsp;|&nbsp;
-      <li><a href="/login">Fazer Login</a></li>
+      <li><a href="/contato">Contato</a></li>&nbsp;|&nbsp;
+      <li *ngIf="!isLoggedIn"><a href="/login">Fazer Login</a></li>
+      <li *ngIf="isLoggedIn"><a href="/">Meus Links</a></li>
     </ul>
   </div>
   <a class="d-block d-md-none" (click)="toggleHamburger()">
@@ -14,9 +14,10 @@
   <div *ngIf="expanded" class="d-flex d-md-none list">
     <ul>
       <li><a href="/planos">Planos</a></li>
-      <li><a>Sobre Nós</a></li>
-      <li><a>Ajuda</a></li>
-      <li><a href="/login">Fazer Login</a></li>
+      <li><a href="/contato">Contato</a></li>
+      <li *ngIf="!isLoggedIn"><a href="/login">Fazer Login</a></li>
+      <li *ngIf="isLoggedIn"><a href="/">Meus Links</a></li>
     </ul>
   </div>
 </div>
+<div class="space"></div>

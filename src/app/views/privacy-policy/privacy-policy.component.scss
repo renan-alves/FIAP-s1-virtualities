@@ -1,0 +1,16 @@
+.policy {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 160px);
+  align-items: center;
+  justify-content: center;
+
+  .content {
+    background-color: white;
+    height: calc(100vh - 160px);
+    margin: 0 4em;
+    padding: 1em;
+    overflow: scroll;
+    overflow-x: hidden;
+  }
+}
