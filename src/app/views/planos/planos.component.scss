@@ -1,7 +1,6 @@
 .planos {
-  display: flex;
   flex-direction: column;
-  height: calc(100vh - 160px);
+  min-height: calc(100vh - 160px);
   align-items: center;
   justify-content: center;
   color: white;
