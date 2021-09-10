@@ -5,7 +5,7 @@ const routes: Routes = [
   {
     path: '',
     loadChildren: () => import('./views/home/home.module')
-      .then(m => m.HomeModule)
+      .then(m => m.HomeModule), data: { bodyClass: 'home' }
   },
   {
     path: 'download/:fileId',
@@ -30,7 +30,7 @@ const routes: Routes = [
   {
     path: 'contato',
     loadChildren: () => import('./views/contact/contact.module')
-      .then(m => m.ContactModule)
+      .then(m => m.ContactModule), data: { bodyClass: 'contato' }
   },
   {
     path: 'termos-de-uso',

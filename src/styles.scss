@@ -2,18 +2,22 @@
 
 body {
   background-color: black;
-  background-image: url(assets/backgrounds/background-1.png);
   background-size: cover;
   background-repeat: no-repeat;
   font-family: "Open Sans", sans-serif;
 }
 
 body.home {
-  background-image: url(assets/backgrounds/background-1.png);
+  background-image: url(assets/backgrounds/background-home.png);
 }
 
 body.planos {
   background-image: url(assets/backgrounds/background-planos.png);
+}
+
+body.contato {
+  background-image: url(assets/backgrounds/background-contato.png);
+  background-size: contain;
 }
 
 .button {
