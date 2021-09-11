@@ -1,0 +1,30 @@
+.arquivos {
+  flex-direction: column;
+  min-height: calc(100vh - 160px);
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background-color: white;
+
+  .preview{
+    color: black;
+  }
+
+  .highlightTableColor{
+    background-color: #e8f0fe;
+  }
+
+  .noselect {
+    user-select: none;
+  }
+  
+  .pointer {
+    cursor: pointer;
+  }
+
+  .icon-remove{
+    width: 1.33em;
+    
+  }
+
+}

@@ -6,6 +6,7 @@ export interface IFile {
   downloadLimit: number;
   downloadCount?: number;
   expirationDate: number;
+  nickname?: string;
   password?: string;
   requirePassword: boolean;
   userId?: string;
