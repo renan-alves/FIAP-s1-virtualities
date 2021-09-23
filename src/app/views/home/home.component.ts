@@ -18,6 +18,7 @@ import firebase from 'firebase';
 import { Step1Component } from 'src/app/components/steps/step1/step1.component';
 import { FireService } from 'src/app/services/base/fire.service';
 import { AngularFireAuth } from '@angular/fire/auth';
+import { NgxFileDropEntry, FileSystemFileEntry, FileSystemDirectoryEntry } from 'ngx-file-drop';
 
 @Component({
   selector: 'app-home',
@@ -240,50 +241,33 @@ export class HomeComponent implements OnInit {
     this.generateLink();
   }
 
-  @HostListener('dragover', ['$event'])
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
+  public dropped(files: NgxFileDropEntry[]) {
+
+    for (const droppedFile of files) {
+      if (droppedFile.fileEntry.isFile) {
+        const fileEntry = droppedFile.fileEntry as FileSystemFileEntry;
+        fileEntry.file((file: File) => {
+          const newFile = new File([file], droppedFile.relativePath);
+          this.files.push(newFile);
+          this.step1.getLeftSize();
+        });
+      }
+      // else {
+      //   // It was a directory (empty directories are added, otherwise only files)
+      //   const fileEntry = droppedFile.fileEntry as FileSystemDirectoryEntry;
+      //   console.log(droppedFile.relativePath, fileEntry);
+      // }
+    }
+
+    this.active = false;
+  }
+
+  public fileOver(): void {
     this.active = true;
   }
 
-  @HostListener('dragleave', ['$event'])
-  onDragLeave(event: DragEvent): void {
+  public fileLeave(event: DragEvent): void {
     if (event.clientX < 1 && event.clientY < 1)
       this.active = false;
-  }
-
-  @HostListener('drop', ['$event'])
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    this.active = false;
-
-    const { dataTransfer } = event;
-
-    if (dataTransfer.items) {
-      for (let i = 0; i < dataTransfer.items.length; i++) {
-        if (dataTransfer.items[i].kind === 'file') {
-          this.files.push(dataTransfer.items[i].getAsFile());
-        }
-      }
-      dataTransfer.items.clear();
-    }
-
-    this.step1.getLeftSize();
-    this.active = false;
-  }
-
-  @HostListener('body:dragover', ['$event'])
-  onBodyDragOver(event: DragEvent) {
-    if (this.preventBodyDrop) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-  }
-  @HostListener('body:drop', ['$event'])
-  onBodyDrop(event: DragEvent) {
-    if (this.preventBodyDrop) {
-      event.preventDefault();
-    }
   }
 }

@@ -51,8 +51,8 @@ export class Step1Component implements OnInit {
   getLeftSize(): void {
     this.error = false;
 
-
     const totalSize = this.files.reduce((acc, curr) => acc + curr.size, 0);
+    console.log(totalSize);
     const usedSize = (this.plan ? this.plan.storageLimit : this.anonymousDefaultSize) -
       totalSize -
       (this.user ? this.user.storage : 0);

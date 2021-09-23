@@ -1,34 +1,45 @@
 <div class="home">
-  <span *ngIf="!active" class="text d-none d-md-block">
-    {{stepMessages[step - 1]}}
-  </span>
-  <span *ngIf="step == 1 && active" class="text">
-    Pode soltar!
-  </span>
+  <ngx-file-drop (onFileDrop)="dropped($event)" (onFileOver)="fileOver()" (onFileLeave)="fileLeave($event)">
+    <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+      <div class="content">
+        <span *ngIf="!active" class="text d-none d-md-block">
+          {{stepMessages[step - 1]}}
+        </span>
+        <span *ngIf="step == 1 && active" class="text">
+          Pode soltar!
+        </span>
 
-  <div class="box" [class.expandable]="files.length > 0" [class.resume]="step == 3 && uploaded">
-    <ng-container [ngSwitch]="step">
-      <ng-container *ngSwitchCase="1" [ngTemplateOutlet]="step1"></ng-container>
-      <ng-container *ngSwitchCase="2" [ngTemplateOutlet]="step2"></ng-container>
-      <ng-container *ngSwitchCase="3" [ngTemplateOutlet]="step3"></ng-container>
-    </ng-container>
-  </div>
+        <div class="box" [class.expandable]="files.length > 0" [class.resume]="step == 3 && uploaded">
+          <ng-container [ngSwitch]="step">
+            <ng-container *ngSwitchCase="1" [ngTemplateOutlet]="step1"></ng-container>
+            <ng-container *ngSwitchCase="2" [ngTemplateOutlet]="step2"></ng-container>
+            <ng-container *ngSwitchCase="3" [ngTemplateOutlet]="step3"></ng-container>
+          </ng-container>
+        </div>
 
-  <app-stepper *ngIf="step < 3" [step]=step></app-stepper>
+        <app-stepper *ngIf="step < 3" [step]=step></app-stepper>
 
-  <div *ngIf="errorMessage" class="box text-center mb-2">
-    {{errorMessage}}
-  </div>
+        <div *ngIf="errorMessage" class="box text-center mb-2">
+          {{errorMessage}}
+        </div>
 
-  <button (click)="nextStep()" class="button primary" [disabled]="errorMessage" *ngIf="(files.length && files.length > 0) || step === 3">
-    {{buttonText}}
-  </button>
+        <button (click)="nextStep()" class="button primary" [disabled]="errorMessage"
+          *ngIf="(files.length && files.length > 0) || step === 3">
+          {{buttonText}}
+        </button>
+      </div>
+    </ng-template>
+  </ngx-file-drop>
 </div>
 
-<div class="dropzone" [ngStyle]="{'z-index':active ? 9 : -9 }"></div>
+<!-- <div class="dropzone" [ngStyle]="{'z-index':active ? 9 : -9 }"> -->
+
+
+<!-- </div> -->
 
 <ng-template #step1>
-  <app-step1 [files]="files" [plan]="plan" [user]="user" (fileCallback)="handleStep1($event)" (errorCallback)="handleStepsErros($event)"></app-step1>
+  <app-step1 [files]="files" [plan]="plan" [user]="user" (fileCallback)="handleStep1($event)"
+    (errorCallback)="handleStepsErros($event)"></app-step1>
 </ng-template>
 
 <ng-template #step2>
