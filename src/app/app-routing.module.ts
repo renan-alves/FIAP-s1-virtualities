@@ -41,7 +41,8 @@ const routes: Routes = [
     path: 'politica-de-privacidade',
     loadChildren: () => import('./views/privacy-policy/privacy-policy.module')
       .then(m => m.PrivacyPolicyModule)
-  }
+  },
+  { path: 'arquivos', loadChildren: () => import('./views/arquivos/arquivos.module').then(m => m.ArquivosModule) }
 ];
 
 @NgModule({

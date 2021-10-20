@@ -1,6 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { IPlan } from 'src/app/interfaces/plan';
 import { IUser } from 'src/app/interfaces/users';
+import { humanFileSize } from 'src/app/_commom/util';
 
 @Component({
   selector: 'app-step1',
@@ -38,16 +39,6 @@ export class Step1Component implements OnInit {
     this.getLeftSize();
   }
 
-  humanFileSize(bytes: number) {
-    const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    let i = 0;
-    while (bytes >= 1024) {
-      bytes /= 1024;
-      ++i;
-    }
-    return Math.floor(bytes * 100) / 100 + ' ' + units[i];
-  }
-
   getLeftSize(): void {
     this.error = false;
 
@@ -56,10 +47,10 @@ export class Step1Component implements OnInit {
     const usedSize = (this.plan ? this.plan.storageLimit : this.anonymousDefaultSize) -
       totalSize -
       (this.user ? this.user.storage : 0);
-    this.leftSize = this.humanFileSize(usedSize);
+    this.leftSize = humanFileSize(usedSize);
 
     if (usedSize < 0) {
-      this.leftSize = this.humanFileSize(usedSize * -1);
+      this.leftSize = humanFileSize(usedSize * -1);
       this.error = true;
     }
 
@@ -77,5 +68,9 @@ export class Step1Component implements OnInit {
     this.getLeftSize();
     if (this.files.length < 1)
       this.errorCallback.emit(null);
+  }
+
+  humanFileSize(bytes: number) {
+    humanFileSize(bytes);
   }
 }
