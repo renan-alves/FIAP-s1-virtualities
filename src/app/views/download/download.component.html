@@ -1,7 +1,7 @@
 <div class="download">
 
   <div class="box">
-    
+
     <!-- Arquivo existe -->
     <ng-container *ngIf="file">
       <span>Você recebeu um link</span>
@@ -29,10 +29,10 @@
     <ng-container *ngIf="!file && downloaded">
       <span>Download iniciado!</span>
     </ng-container>
-    
+
     <button class="button primary" (click)="download(file)" *ngIf="file && !unavailableReason && !downloaded">Download</button>
 
-    <a>Quer compartilhar também?</a>
+    <a href="/">Quer compartilhar também?</a>
   </div>
 
 </div>

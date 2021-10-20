@@ -16,12 +16,15 @@ export class SignUpFormComponent implements OnInit {
 
   registerError: string;
   submited: boolean;
+  loading: boolean;
   isGoogle: boolean;
 
   registerForm = new FormGroup({
     name: new FormControl('', Validators.required),
-    email: new FormControl('', Validators.required),
-    password: new FormControl('', Validators.required)
+    email: new FormControl('', [
+      Validators.required,
+      Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]),
+    password: new FormControl('', [Validators.required, Validators.minLength(6)])
   })
 
   constructor(private authService: AuthService,
@@ -48,6 +51,14 @@ export class SignUpFormComponent implements OnInit {
 
   async register(content: TemplateRef<unknown>): Promise<void> {
     this.submited = true;
+    this.loading = true;
+
+    if (!this.registerForm.valid) {
+      this.registerError = "Verifique o preenchimento dos campos!";
+      this.loading = false;
+      return;
+    }
+
 
     const email = this.registerForm.get('email').value;
     const password = this.registerForm.get('password').value;
@@ -71,6 +82,7 @@ export class SignUpFormComponent implements OnInit {
 
       this.route.navigate(['/login']);
       this.modalService.open(content);
+      this.loading = false;
     }).catch(error => {
       if (error.code == 'auth/email-already-in-use')
         this.registerError = 'E-mail já cadastrado!';
