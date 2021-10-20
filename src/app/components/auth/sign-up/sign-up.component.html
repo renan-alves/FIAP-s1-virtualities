@@ -14,7 +14,7 @@
         [class.is-invalid]="submited && !registerForm.controls.password.valid">
     </div>
     <p *ngIf="registerError"> {{registerError}} </p>
-    <button type="button" class="button primary" (click)="register(verification)">
+    <button type="button" class="button primary" [disabled]="loading" (click)="register(verification)">
       {{ isGoogle ? "Avançar" : "Cadastrar" }}
     </button>
 
