@@ -1,36 +1,40 @@
 <div class="download">
 
   <div class="box">
+    <span>Você recebeu um link</span>
 
-    <!-- Arquivo existe -->
-    <ng-container *ngIf="file">
-      <span>Você recebeu um link</span>
+    <div class="d-flex flex-column align-items-center">
+      <!-- Arquivo existe -->
+      <div *ngIf="file">
 
-      <!-- Arquivo tem senha -->
-      <ng-container *ngIf="file.requirePassword">
-        <p>Insira a chave de segurança para baixar</p>
-        <input type="password" [formControl]="password" class="form-control" placeholder="Senha" />
-        <small *ngIf="invalidPassword">Senha inválida</small>
-      </ng-container>
+        <!-- Arquivo tem senha -->
+        <div *ngIf="file.requirePassword">
+          <p>Insira a chave de segurança para baixar</p>
+          <input type="password" [formControl]="password" class="form-control" placeholder="Senha" />
+          <small *ngIf="invalidPassword">Senha inválida</small>
+        </div>
 
-      <!-- Arquivo sem senha -->
-      <ng-container *ngIf="!file.requirePassword">
-        Tudo pronto!
-      </ng-container>
-    </ng-container>
+        <!-- Arquivo sem senha -->
+        <div *ngIf="!file.requirePassword">
+          Tudo pronto!
+        </div>
+      </div>
 
-    <!-- Arquivo não existe / indisponível -->
-    <ng-container *ngIf="!file && !downloaded">
-      <span>Oops!</span>
-      {{unavailableReason}}
-    </ng-container>
+      <!-- Arquivo não existe / indisponível -->
+      <div *ngIf="!file && !downloaded">
+        <span>Oops!</span>
+        {{unavailableReason}}
+      </div>
 
-    <!-- Já baixou -->
-    <ng-container *ngIf="!file && downloaded">
-      <span>Download iniciado!</span>
-    </ng-container>
+      <!-- Já baixou -->
+      <div *ngIf="!file && downloaded">
+        <span>Download iniciado!</span>
+      </div>
 
-    <button class="button primary" (click)="download(file)" *ngIf="file && !unavailableReason && !downloaded">Download</button>
+      <button class="button primary mt-2" (click)="download(file)"
+        *ngIf="file && !unavailableReason && !downloaded">Download</button>
+    </div>
+
 
     <a href="/">Quer compartilhar também?</a>
   </div>
