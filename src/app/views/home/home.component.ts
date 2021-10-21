@@ -212,6 +212,7 @@ export class HomeComponent implements OnInit {
       input.select();
       document.execCommand('copy');
       document.body.removeChild(input);
+      this.buttonText = "Copiado!";
     }
     else {
       this.step++;

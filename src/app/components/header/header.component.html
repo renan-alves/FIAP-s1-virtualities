@@ -3,7 +3,7 @@
   <div class="d-none d-md-flex menu">
     <ul *ngIf="showMenu" >
       <li><a href="/planos">Planos</a></li>&nbsp;|&nbsp;
-      <li><a href="/contato">Contato</a></li>&nbsp;|&nbsp;
+      <li><a href="/contato">Sobre nós</a></li>&nbsp;|&nbsp;
       <li *ngIf="!isLoggedIn"><a href="/login">Fazer Login</a></li>
       <li *ngIf="isLoggedIn"><a href="/arquivos">Meus Links</a></li>
     </ul>
@@ -14,7 +14,7 @@
   <div *ngIf="expanded" class="d-flex d-md-none list">
     <ul>
       <li><a href="/planos">Planos</a></li>
-      <li><a href="/contato">Contato</a></li>
+      <li><a href="/contato">Sobre nós</a></li>
       <li *ngIf="!isLoggedIn"><a href="/login">Fazer Login</a></li>
       <li *ngIf="isLoggedIn"><a href="/arquivos">Meus Links</a></li>
     </ul>
