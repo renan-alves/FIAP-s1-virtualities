@@ -206,44 +206,49 @@ export class ArquivosComponent implements OnInit {
     return file.nickname;
   }
 
-  private async buildItens(path: string): Promise<Item[]> {
+  private async buildItens(path: string, resetKnowItem = false): Promise<Item[]> {
     const indexKnowItem = this.knowItens.findIndex(k => k.fullPath === path);
 
     if (indexKnowItem !== -1) {
-      return this.knowItens[indexKnowItem].itens;
-    } else {
-      const fileStorage = await this.afStorage.ref(path).listAll().toPromise();
-
-      const itens = await Promise.all(fileStorage.items.map(async (i, index) => {
-        // Pega as informações mais específicas do arquivo
-        const metadata = await fileStorage.items[index].getMetadata();
-        return (
-          {
-            completePath: i.fullPath,
-            name: i.name,
-            size: this.getSize(metadata),
-            typeFile: this.getFileType(metadata),
-            type: TypeItemEnum.SingleFile
-          }
-        ) as Item
-      }));
-
-      const folders = await Promise.all(fileStorage.prefixes.map(async p => {
-        return (
-          {
-            completePath: p.fullPath,
-            name: p.name,
-            size: '-',
-            type: TypeItemEnum.Folder
-          }
-        ) as Item
-      }));
-
-      const itensRetorno = itens.concat(folders);
-      this.knowItens.push({ fullPath: path, itens: itensRetorno });
-
-      return itensRetorno;
+      // Caso seja requisitado, reseta a informação em memória, para "forçar" um recarregamento deste diretório
+      if (resetKnowItem) {
+        this.knowItens.splice(indexKnowItem, 1);
+      } else {
+        return this.knowItens[indexKnowItem].itens;
+      }
     }
+
+    const fileStorage = await this.afStorage.ref(path).listAll().toPromise();
+
+    const itens = await Promise.all(fileStorage.items.map(async (i, index) => {
+      // Pega as informações mais específicas do arquivo
+      const metadata = await fileStorage.items[index].getMetadata();
+      return (
+        {
+          completePath: i.fullPath,
+          name: i.name,
+          size: this.getSize(metadata),
+          typeFile: this.getFileType(metadata),
+          type: TypeItemEnum.SingleFile
+        }
+      ) as Item
+    }));
+
+    const folders = await Promise.all(fileStorage.prefixes.map(async p => {
+      return (
+        {
+          completePath: p.fullPath,
+          name: p.name,
+          size: '-',
+          type: TypeItemEnum.Folder
+        }
+      ) as Item
+    }));
+
+    const itensRetorno = itens.concat(folders);
+    this.knowItens.push({ fullPath: path, itens: itensRetorno });
+
+    return itensRetorno;
   }
 
   /**
@@ -527,23 +532,58 @@ export class ArquivosComponent implements OnInit {
 
     // Espera o resultado
     this.modalRef.componentInstance.userAction.subscribe(
-      (userConfirm) => {
+      async (userConfirm) => {
         console.log(userConfirm);
         if (userConfirm) {
           if (mode === ModalOpenMode.Remove) {
-            this.selection.selected.forEach(arquivo => {
-              this.afStorage.ref(arquivo.item.completePath).delete()
-                .subscribe((result) => {
-                  // Atualiza o grid
-                  this.dataSource.data = this.dataSource.data.filter(d => d.item.completePath !== arquivo.item.completePath);
+            this.showLoader = true;
+            this.selection.selected.forEach(async (arquivo, index) => {
+              await this.afStorage.ref(arquivo.item.completePath).delete().toPromise();
 
-                  // Pega o diretório atual e atualiza a informação
-                  let diretorioAtual = this.knowItens.find(k => k.fullPath === this.actualPath).itens;
-                  this.knowItens.find(k => k.fullPath === this.actualPath).itens = diretorioAtual.filter(i => i.completePath !== arquivo.item.completePath);
-                },
-                  (err) => { console.error(err) });
+              if (index === this.selection.selected.length - 1) {
+                // Compila os arquivos que foram deletados
+                const arquivosDeletados = this.selection.selected.map(s => s.item.completePath);
+
+                // Atualiza a tabela
+                this.dataSource.data = this.dataSource.data
+                  .filter(d => arquivosDeletados.findIndex(a => a === d.item.completePath) === -1);
+
+                // Pega o diretório atual e atualiza a informação em memória
+                const diretorioAtual = this.knowItens.find(k => k.fullPath === this.actualPath).itens;
+                this.knowItens
+                  .find(k => k.fullPath === this.actualPath).itens = diretorioAtual
+                    .filter(d => arquivosDeletados
+                      .findIndex(a => a === d.completePath) === -1);
+              }
             });
+
+            this.showLoader = false;
           } else if (mode === ModalOpenMode.Disable) {
+            this.showLoader = true;
+            this.selection.selected.forEach(async (arquivo, index) => {
+              // Atualiza a informação no firebase
+              await this.fireService.Firestore.collection('files').doc(arquivo.docId).set({ active: false }, { merge: true }).toPromise();
+
+              if (index === this.selection.selected.length - 1) {
+
+                // Compila os arquivos que foram deletados
+                const arquivosDesabilitados = this.selection.selected.map(s => s.item.completePath);
+                console.log('arquivosDesabilitados', arquivosDesabilitados);
+                console.log('this.dataSource.data', this.dataSource.data);
+                
+                console.log(this.dataSource.data.filter(d => arquivosDesabilitados.findIndex(a => a === d.item.completePath) !== -1));
+                this.dataSource.data
+                  .filter(d => arquivosDesabilitados.findIndex(a => a === d.item.completePath) !== -1)
+                  .forEach(d => d.status = FileStatusEnum.NaoDisponivel);
+
+                // Pega o diretório raiz(onde estão contidos os Links) e atualiza a informação
+                this.knowItens.find(k => k.fullPath === '/').itens
+                  .filter(d => arquivosDesabilitados.findIndex(a => a === d.completePath) !== -1)
+                  .forEach(a => a.status = FileStatusEnum.NaoDisponivel);
+              }
+            });
+
+            this.showLoader = false;
             // TODO: Disable
           }
         }
@@ -554,27 +594,35 @@ export class ArquivosComponent implements OnInit {
 
   async handleEdit(): Promise<void> {
     await this.openDialog(ModalOpenMode.Edit);
-
     this.modalRef.componentInstance.userAction.subscribe(
-      (userConfirm) => {
+      async (userConfirm) => {
         if (userConfirm && this.filesUpload.length > 0) {
           this.showLoader = true;
           const uploadStatus = [] as boolean[];
 
-          this.filesUpload.forEach(fileUpload => {
-
-            console.log(fileUpload);
+          this.filesUpload.forEach(async fileUpload => {
             const path = this.actualPath + '/' + fileUpload.name;
 
             const task = this.afStorage.upload(path, fileUpload);
+
+            await task.snapshotChanges().toPromise();
             task.snapshotChanges().subscribe(
-              (snap) => {
+              async (snap) => {
                 if (snap.state === firebase.storage.TaskState.ERROR || snap.state === firebase.storage.TaskState.CANCELED || snap.state === firebase.storage.TaskState.PAUSED) {
                   // TODO: Tratar erro
                 }
 
                 if (snap.state === firebase.storage.TaskState.SUCCESS) {
                   uploadStatus.push(true);
+                }
+
+                if (uploadStatus.length === this.filesUpload.length) {
+                  const itens = await this.buildItens(this.actualPath, true);
+
+                  console.log(itens);
+                  this.buildGrid(itens);
+                  this.filesUpload = [];
+                  this.modalRef.close();
                 }
               },
               (error) => {
@@ -583,9 +631,10 @@ export class ArquivosComponent implements OnInit {
               () => this.showLoader = false,
             );
           });
+        } else {
+          this.filesUpload = [];
+          this.modalRef.close();
         }
-        this.filesUpload = [];
-        this.modalRef.close();
       }
     );
   }
@@ -627,16 +676,15 @@ export class ArquivosComponent implements OnInit {
     }, 0);
   }
 
-  onFileSelected(event: 
-    { target: 
-      { 
-        files: File[]; 
-      }; 
+  onFileSelected(event:
+    {
+      target:
+      {
+        files: File[];
+      };
     }) {
 
     this.filesUpload = this.filesUpload.concat(Object.values(event.target.files));
-
-    console.log('asdasdasdijlk', Object.values(event.target.files));
   }
 
   openFileInput() {
