@@ -20,30 +20,30 @@
               </div>
             </li>
           </ul>
-          <div class="row d-inline-flex">
-            <div class="col-6" (click)="handlerClickedArrow(navigationModeEnum.Back)">
-              <fa-icon [icon]="faAngleLeft" size="lg" [ngClass]="hasItemBack() ? 'text-dark pointer' : 'text-danger '">
-              </fa-icon>
-            </div>
-            <div class="col-6" (click)="handlerClickedArrow(navigationModeEnum.Foward)">
-              <fa-icon [icon]="faAngleRight" size="lg"
-                [ngClass]="hasItemFoward() ? 'text-dark pointer' : 'text-danger '">
-              </fa-icon>
-            </div>
-          </div>
-          <br>
           <div class="row">
-            <div class="col-6">
-              <mat-form-field appearance="standard">
-                <mat-label>Filter</mat-label>
-                <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
-              </mat-form-field>
+            <div class="col-6 d-flex align-items-end pb-2">
+              <div class="row d-inline-flex">
+                <div class="col-6" (click)="handlerClickedArrow(navigationModeEnum.Back)">
+                  <fa-icon [icon]="faAngleLeft" size="lg" [ngClass]="hasItemBack() ? 'text-dark pointer' : 'text-danger '">
+                  </fa-icon>
+                </div>
+                <div class="col-6" (click)="handlerClickedArrow(navigationModeEnum.Foward)">
+                  <fa-icon [icon]="faAngleRight" size="lg"
+                    [ngClass]="hasItemFoward() ? 'text-dark pointer' : 'text-danger '">
+                  </fa-icon>
+                </div>
+              </div>
             </div>
-            <div class="col-6 align-self-center">
-              <div class="d-flex flex-row-reverse">
+            <div class="col-6">
+              <div class="d-flex flex-row-reverse  align-items-center">
+
                 <fa-icon *ngIf="!isLinkLayer" [icon]="faFileUpload" (click)="handleEdit()" size="lg"
                   [ngClass]="'text-primary pointer'">
                 </fa-icon>
+                <mat-form-field appearance="standard">
+                  <mat-label>Filter</mat-label>
+                  <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
+                </mat-form-field>
               </div>
             </div>
           </div>
