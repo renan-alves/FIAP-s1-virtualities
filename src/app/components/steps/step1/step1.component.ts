@@ -70,7 +70,7 @@ export class Step1Component implements OnInit {
       this.errorCallback.emit(null);
   }
 
-  humanFileSize(bytes: number) {
-    humanFileSize(bytes);
+  humanFileSize(bytes: number): string {
+    return humanFileSize(bytes);
   }
 }

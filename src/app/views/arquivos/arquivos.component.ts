@@ -38,6 +38,8 @@ export class ArquivosComponent implements OnInit {
 
   @ViewChild('nickNameInput') nickNameInputElement: ElementRef;
 
+  @ViewChild('disableRemoveModalHeader') disableRemoveModalHeader: TemplateRef<any>;
+
   @ViewChild('disableRemoveModalBody') disableRemoveModalBody: TemplateRef<any>;
 
   @ViewChild('editModalBody') editModalBody: TemplateRef<any>;
@@ -136,6 +138,8 @@ export class ArquivosComponent implements OnInit {
    */
   isEditMode = false;
 
+  disableDeleteModalHeaderText = '';
+
   disableDeleteModalText = '';
 
   filesUpload: File[] = [];
@@ -163,6 +167,7 @@ export class ArquivosComponent implements OnInit {
     // Pega a informação de todos Compartilhamentos do usuário 
     this.allSharedFiles = await this.getAllSharedFilesOfLoggedUser();
 
+    // A partir dos arquivos da tabela Files, recupera os arquivos no Storage
     this.allFiles = await Promise.all(this.getAllLinks());
 
     this.knowItens.push({ fullPath: '/', itens: this.allFiles });
@@ -223,6 +228,9 @@ export class ArquivosComponent implements OnInit {
     const itens = await Promise.all(fileStorage.items.map(async (i, index) => {
       // Pega as informações mais específicas do arquivo
       const metadata = await fileStorage.items[index].getMetadata();
+      const teste = await fileStorage.items[index].getDownloadURL();
+      console.log(teste);
+      //console.log(metadata);
       return (
         {
           completePath: i.fullPath,
@@ -347,13 +355,7 @@ export class ArquivosComponent implements OnInit {
 
     navigationLineActual.forEach((n, index) => {
       let name;
-      // Se for o primeiro
-      if (index === 0) {
-        name = n.name;
-      } else {
-        name = ' > ' + n.name;
-      }
-      this.navigationExibicao.push({ name: name, itemPath: n.itemPath });
+      this.navigationExibicao.push({ name: n.name, itemPath: n.itemPath });
     });
   }
 
@@ -363,18 +365,25 @@ export class ArquivosComponent implements OnInit {
 
     // Avalia qual é o modal certo, a partir do modo de abertura
     if (mode === ModalOpenMode.Edit) {
+      this.disableDeleteModalHeaderText = 'Upload de Arquivos';
       modalBody = this.editModalBody;
 
     } else {
       modalBody = this.disableRemoveModalBody;
-      this.disableDeleteModalText = mode === ModalOpenMode.Disable ?
-        "Tem certeza que deseja desabilitar o compartilhamente deste Link?" :
-        "Tem certeza que deseja remover este arquivo?";
+
+      if (mode === ModalOpenMode.Disable) {
+        this.disableDeleteModalHeaderText = 'Desabilitar Link';
+        this.disableDeleteModalText = 'Tem certeza que deseja desabilitar permanentemente o compartilhamente deste Link?';
+      } else {
+        this.disableDeleteModalHeaderText = 'Apagar arquivos';
+        this.disableDeleteModalText = 'Tem certeza que deseja remover permanentemente os arquivos selecionados?';
+      }
     }
 
     // Abre o modal
     this.modalRef = this.dialog.open(ModalComponent, {
       data: {
+        templateHeader: this.disableRemoveModalHeader,
         templateBody: modalBody,
       } as ModalData
     });
@@ -565,13 +574,10 @@ export class ArquivosComponent implements OnInit {
               await this.fireService.Firestore.collection('files').doc(arquivo.docId).set({ active: false }, { merge: true }).toPromise();
 
               if (index === this.selection.selected.length - 1) {
-
-                // Compila os arquivos que foram deletados
+                // Compila os arquivos que foram desabilitados
                 const arquivosDesabilitados = this.selection.selected.map(s => s.item.completePath);
-                console.log('arquivosDesabilitados', arquivosDesabilitados);
-                console.log('this.dataSource.data', this.dataSource.data);
-                
-                console.log(this.dataSource.data.filter(d => arquivosDesabilitados.findIndex(a => a === d.item.completePath) !== -1));
+
+                // Atualiza a tabela
                 this.dataSource.data
                   .filter(d => arquivosDesabilitados.findIndex(a => a === d.item.completePath) !== -1)
                   .forEach(d => d.status = FileStatusEnum.NaoDisponivel);
@@ -584,7 +590,6 @@ export class ArquivosComponent implements OnInit {
             });
 
             this.showLoader = false;
-            // TODO: Disable
           }
         }
         this.modalRef.close();
@@ -618,8 +623,6 @@ export class ArquivosComponent implements OnInit {
 
                 if (uploadStatus.length === this.filesUpload.length) {
                   const itens = await this.buildItens(this.actualPath, true);
-
-                  console.log(itens);
                   this.buildGrid(itens);
                   this.filesUpload = [];
                   this.modalRef.close();
@@ -689,6 +692,17 @@ export class ArquivosComponent implements OnInit {
 
   openFileInput() {
     this.fileInput.nativeElement.click();
+  }
+
+  removeFile(index: number) {
+    this.filesUpload.splice(index, 1);
+    // this.getLeftSize();
+/*     if (this.filesUpload.length < 1)
+      this.errorCallback.emit(null); */
+  }
+
+  humanFileSize(bytes: number): string {
+    return humanFileSize(bytes);
   }
 }
 

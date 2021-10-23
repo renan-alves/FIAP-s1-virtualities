@@ -6,6 +6,10 @@
   color: white;
   background-color: white;
 
+  .right-margin{
+    border-right: 1px solid #d3dae0;
+  }
+
   .preview{
     color: black;
   }
@@ -27,4 +31,38 @@
     
   }
 
+  .navigation-item-interaction:hover {
+    cursor: pointer;
+    background-color: rgb(245, 243, 243);
+  }
+
+  .navigation-item {
+    h3{
+      color:rgb(84, 84, 84);
+    }
+  }
+  
+  .navigation-item-last {
+    cursor: default;
+    h3 {
+      color:rgb(0, 0, 0);
+    }
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: auto;
+    background-repeat: no-repeat;
+  
+    &:hover,
+    &:focus {
+      filter: invert(30%) sepia(100%) saturate(921%) hue-rotate(175deg) brightness(97%) contrast(97%);
+    }
+  }
+
+  .container-fluid{
+    height: calc(100vh - 160px);
+  }
 }
