@@ -24,7 +24,8 @@
             <div class="col-6 d-flex align-items-end pb-2">
               <div class="row d-inline-flex">
                 <div class="col-6" (click)="handlerClickedArrow(navigationModeEnum.Back)">
-                  <fa-icon [icon]="faAngleLeft" size="lg" [ngClass]="hasItemBack() ? 'text-dark pointer' : 'text-danger '">
+                  <fa-icon [icon]="faAngleLeft" size="lg"
+                    [ngClass]="hasItemBack() ? 'text-dark pointer' : 'text-danger '">
                   </fa-icon>
                 </div>
                 <div class="col-6" (click)="handlerClickedArrow(navigationModeEnum.Foward)">
@@ -125,12 +126,19 @@
         </form>
         <div class="row">
           <ul style="list-style-type: none;">
-            <li *ngIf="!isNullOrEmpty(previewFile.name)">
 
-            </li>
             <li *ngIf="!isNullOrEmpty(previewFile.size)">Tamanho: {{previewFile.size}}</li>
             <li *ngIf="!isNullOrEmpty(previewFile.typeFile)">Tipo de Arquivo: {{previewFile.typeFile}}</li>
-            <li *ngIf="!isNullOrEmpty(previewFile.status)">Status: {{previewFile.status}}</li>
+            <li *ngIf="!isNullOrEmpty(previewFile.status)">Status:
+              <ng-container [ngSwitch]="previewFile.status">
+                <span *ngSwitchCase="statusEnum.Disponivel">
+                  Disponível <fa-icon [icon]="faCircle" size="lg" class="text-success"></fa-icon>
+                </span>
+                <span *ngSwitchCase="statusEnum.NaoDisponivel">
+                  Indisponível <fa-icon fa-icon [icon]="faCircle" size="lg" class="text-danger"></fa-icon>
+                </span>
+              </ng-container>
+            </li>
             <li *ngIf="!isNullOrEmpty(previewFile.dataCriacao)">Criado em: {{previewFile.dataCriacao}}</li>
             <li *ngIf="!isNullOrEmpty(previewFile.dataExpiracao)">Expira em: {{previewFile.dataExpiracao}}</li>
             <li *ngIf="!isNullOrEmpty(previewFile.downloadLimit)">Limite de downloads: {{previewFile.downloadLimit}}
@@ -138,6 +146,17 @@
             <li *ngIf="!isNullOrEmpty(previewFile.downloadCount)">Contagem de downloads: {{previewFile.downloadCount}}
             </li>
           </ul>
+        </div>
+        <div class="row">
+          <div class="col-6">
+
+            <div class="card text-center h-100">
+              <div class="card-body">
+                <h3 class="card-title"> Downloads Restantes</h3>
+                <h1 class="display-3">{{ previewFile.downloadLimit - previewFile.downloadCount }}</h1>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

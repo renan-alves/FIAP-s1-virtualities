@@ -297,11 +297,12 @@ export class ArquivosComponent implements OnInit {
         docId: docId,
         canEdit: true,
         name: item.name,
-        status: this.getStatus(item.status),
+        status: item.status,
         dataCriacao: item.dataCriacao,
         dataExpiracao: item.dataExpiracao,
         downloadLimit: item.downloadLimit,
-        downloadCount: item.downloadCount ?? 0
+        downloadCount: item.downloadCount ?? 0,
+
       } as PreviewFile;
   }
 
@@ -720,7 +721,7 @@ export class PreviewFile {
   canEdit: boolean;
   name: string;
   size: string;
-  status: string;
+  status: FileStatusEnum;
   typeFile: string;
   dataCriacao: string;
   dataExpiracao: string;
