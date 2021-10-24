@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ModalComponent } from 'src/app/components/modal/modal.component';
+import { CountdownModule } from 'ngx-countdown';
 
 @NgModule({
   declarations: [ArquivosComponent, LoaderComponent, ModalComponent],
@@ -25,7 +26,8 @@ import { ModalComponent } from 'src/app/components/modal/modal.component';
     MatProgressSpinnerModule,
     FormsModule,
     ReactiveFormsModule,
-    MatDialogModule
+    MatDialogModule,
+    CountdownModule
   ]
 })
 export class ArquivosModule { }

@@ -13,8 +13,6 @@ import { FireService } from 'src/app/services/base/fire.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ModalComponent, ModalData } from 'src/app/components/modal/modal.component';
-import { error } from 'console';
-import { finalize } from 'rxjs/operators';
 
 const TEMP: FileGridData[] = [
 ];
@@ -116,6 +114,8 @@ export class ArquivosComponent implements OnInit {
    */
   previewFile: PreviewFile;
 
+  isFolderLoading: boolean;
+
   actualPath: string;
 
   navigationLine: FilePathWithName[] = [];
@@ -154,7 +154,7 @@ export class ArquivosComponent implements OnInit {
     private authService: AuthService,
     private formBuilder: FormBuilder,
     private fireService: FireService,
-    public dialog: MatDialog) { }
+    public dialog: MatDialog,) { }
 
   async ngOnInit(): Promise<void> {
     this.previewFile = new PreviewFile();
@@ -195,8 +195,8 @@ export class ArquivosComponent implements OnInit {
           status: file.active ?
             FileStatusEnum.Disponivel :
             FileStatusEnum.NaoDisponivel,
-          dataCriacao: formatDate(new Date(file.dateCreated), 'dd-MM-yyyy HH:mm', 'pt-BR'),
-          dataExpiracao: formatDate(new Date(file.expirationDate), 'dd-MM-yyyy HH:mm', 'pt-BR'),
+          dataCriacao: file.dateCreated,
+          dataExpiracao: file.expirationDate,
           downloadLimit: file.downloadLimit,
           downloadCount: file.downloadCount ?? 0,
         }
@@ -321,6 +321,7 @@ export class ArquivosComponent implements OnInit {
   }
 
   private async handleClickedFolder(item: Item): Promise<void> {
+    this.isFolderLoading = true;
     this.previewFile = new PreviewFile();
     const itens = await this.buildItens(item.completePath);
 
@@ -329,6 +330,7 @@ export class ArquivosComponent implements OnInit {
     this.actualPath = item.completePath;
 
     this.buildGrid(itens);
+    this.isFolderLoading = false;
   }
 
   private handleClickedSingleFile(item: Item): void {
@@ -388,14 +390,6 @@ export class ArquivosComponent implements OnInit {
         templateBody: modalBody,
       } as ModalData
     });
-  }
-
-  /**
-   * Filtro de busca
-   */
-  applyFilter(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   /**
@@ -698,12 +692,29 @@ export class ArquivosComponent implements OnInit {
   removeFile(index: number) {
     this.filesUpload.splice(index, 1);
     // this.getLeftSize();
-/*     if (this.filesUpload.length < 1)
-      this.errorCallback.emit(null); */
+    /*     if (this.filesUpload.length < 1)
+          this.errorCallback.emit(null); */
   }
 
   humanFileSize(bytes: number): string {
     return humanFileSize(bytes);
+  }
+
+  formatDate(date: number) {
+    return formatDate(new Date(date), 'dd-MM-yyyy HH:mm', 'pt-BR')
+  }
+
+  getDaysRemaining(dataExpiracao: number): string {
+    const dataAtualTime = new Date().getTime();
+    const dataVencimentoTime = new Date(dataExpiracao).getTime();
+
+    const diff = dataVencimentoTime - dataAtualTime;
+
+    if (diff < 0) {
+      return 'Expirado';
+    }
+    
+    return Math.ceil(diff / (1000 * 3600 * 24)).toString();
   }
 }
 
@@ -723,8 +734,8 @@ export class PreviewFile {
   size: string;
   status: FileStatusEnum;
   typeFile: string;
-  dataCriacao: string;
-  dataExpiracao: string;
+  dataCriacao: number;
+  dataExpiracao: number;
   downloadLimit: number;
   downloadCount: number;
 }
@@ -737,8 +748,8 @@ export class Item {
   size: string;
   typeFile: string;
   status: FileStatusEnum;
-  dataCriacao: string;
-  dataExpiracao: string;
+  dataCriacao: number;
+  dataExpiracao: number;
   downloadLimit: number;
   downloadCount: number;
 }

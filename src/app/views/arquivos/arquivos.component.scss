@@ -36,14 +36,20 @@
   }
 
   .navigation-item {
-    h3{
+    h5{
       color:rgb(84, 84, 84);
     }
   }
-  
+
+  .icon-plus {
+    width: 28px;
+    height: 28px;
+    background-image: url(/src/assets/icons/plus-fill-circle.svg);
+  }
+
   .navigation-item-last {
     cursor: default;
-    h3 {
+    h5 {
       color:rgb(0, 0, 0);
     }
   }
@@ -61,7 +67,7 @@
     }
   }
 
-  .container-fluid{
-    height: calc(100vh - 160px);
-  }
+/*   .container-fluid{
+      
+  } */
 }
