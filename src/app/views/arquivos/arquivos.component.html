@@ -2,50 +2,123 @@
 <app-loader [show]="showLoader">
 </app-loader>
 <div class="arquivos">
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-6 d-flex">
-        <div class="flex-fill">
-          <ul class="list-inline">
-            <li class="list-inline-item" (click)="handleClickNavigationItem(file.itemPath)"
-              *ngFor="let file of navigationExibicao">
-              <h3 style="color: black;"> {{file.name}}</h3>
-            </li>
-          </ul>
-          <div class="row d-inline-flex">
-            <div class="col-6" (click)="handlerClickedArrow(navigationModeEnum.Back)">
-              <fa-icon [icon]="faAngleLeft" size="lg" [ngClass]="hasItemBack() ? 'text-dark pointer' : 'text-danger '">
-              </fa-icon>
+  <div class="position-fixed mt-3" style="right: 0; width: 32%;">
+    <!-- Preview -->
+    <div class="preview ps-0 pe-4" *ngIf="showPreview && isAnySelected">
+      <!-- Detalhes do arquivo -->
+      <form [formGroup]="nickNameForm">
+        <div class="row">
+          <div class="col-auto">
+            <h4>{{ isEditMode && previewFile.canEdit ? '' : previewFile.name }}</h4>
+          </div>
+          <div class="col px-0 d-flex">
+            <div *ngIf="previewFile.canEdit" class="">
+              <input *ngIf="isEditMode" #nickNameInput class="w-100" type="text" formControlName="name"
+                (blur)="unfocusHandler()" (keydown.enter)="enterPressedHandler()" />
+              <div *ngIf="!isEditMode" #buttonTeste class="ps-1" role="button" tabindex="0"
+                (keydown.enter)="buttonHandler()" (click)="buttonHandler()">
+                <fa-icon [icon]="faPen" size="lg"></fa-icon>
+              </div>
             </div>
-            <div class="col-6" (click)="handlerClickedArrow(navigationModeEnum.Foward)">
-              <fa-icon [icon]="faAngleRight" size="lg"
-                [ngClass]="hasItemFoward() ? 'text-dark pointer' : 'text-danger '">
-              </fa-icon>
+            <div class="icon-remove ps-2">
+              <div *ngIf="canRemove && !isFolderLoading">
+                <fa-icon *ngIf="isLinkLayer; else remove" [icon]="faBan"
+                  (click)="handleDisableRemove(modalOpenMode.Disable)" size="lg" [ngClass]="'text-danger pointer'">
+                </fa-icon>
+                <ng-template #remove>
+                  <fa-icon [icon]="faTrashAlt" (click)="handleDisableRemove(modalOpenMode.Remove)" size="lg"
+                    [ngClass]="'text-danger pointer'">
+                  </fa-icon>
+                </ng-template>
+              </div>
             </div>
           </div>
-          <br>
-          <div class="row">
-            <div class="col-6">
-              <mat-form-field appearance="standard">
-                <mat-label>Filter</mat-label>
-                <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
-              </mat-form-field>
+        </div>
+      </form>
+      <div class="row">
+        <ul style="list-style-type: none;">
+          <li *ngIf="!isNullOrEmpty(previewFile.size)">Tamanho: {{previewFile.size}}</li>
+          <li *ngIf="!isNullOrEmpty(previewFile.typeFile)">Tipo de Arquivo: {{previewFile.typeFile}}</li>
+          <li *ngIf="!isNullOrEmpty(previewFile.status)">Status:
+            <ng-container [ngSwitch]="previewFile.status">
+              <span *ngSwitchCase="statusEnum.Disponivel">
+                Disponível <fa-icon [icon]="faCircle" size="lg" class="text-success"></fa-icon>
+              </span>
+              <span *ngSwitchCase="statusEnum.NaoDisponivel">
+                Indisponível <fa-icon fa-icon [icon]="faCircle" size="lg" class="text-danger"></fa-icon>
+              </span>
+            </ng-container>
+          </li>
+          <li *ngIf="!isNullOrEmpty(previewFile.dataCriacao)">Criado em: {{ formatDate(previewFile.dataCriacao)}}</li>
+          <li *ngIf="!isNullOrEmpty(previewFile.dataExpiracao)">Expira em: {{ formatDate(previewFile.dataExpiracao)}}
+          </li>
+          <li *ngIf="!isNullOrEmpty(previewFile.downloadLimit)">Limite de downloads: {{previewFile.downloadLimit}}
+          </li>
+          <li *ngIf="!isNullOrEmpty(previewFile.downloadCount)">Contagem de downloads: {{previewFile.downloadCount}}
+          </li>
+        </ul>
+      </div>
+      <div class="row" *ngIf="isLinkLayer && !isFolderLoading">
+        <div class="col-6">
+          <div class="card text-center h-100">
+            <div class="card-body">
+              <h4 class="card-title h4">Tempo Faltando</h4>
+              <h3 class="">
+                <strong> {{ getDaysRemaining(previewFile.dataExpiracao) }} </strong>
+              </h3>
             </div>
-            <div class="col-6 align-self-center">
-              <div class="d-flex flex-row-reverse">
-                <div class="icon-remove ps-2">
-                  <div *ngIf="canRemove">
-                    <fa-icon *ngIf="isLinkLayer; else remove" [icon]="faBan"
-                      (click)="handleDisableRemove(modalOpenMode.Disable)" size="lg" [ngClass]="'text-danger pointer'">
-                    </fa-icon>
-                    <ng-template #remove>
-                      <fa-icon [icon]="faTrashAlt" (click)="handleDisableRemove(modalOpenMode.Remove)" size="lg"
-                        [ngClass]="'text-danger pointer'">
-                      </fa-icon>
-                    </ng-template>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="card text-center h-100">
+            <div class="card-body">
+              <h4 class="card-title h4  "> Downloads Restantes</h4>
+              <h3 class=""><strong>{{ previewFile.downloadLimit - previewFile.downloadCount }}</strong></h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="row h-100">
+      <div class="col-8 d-flex right-margin pe-4 overflow-auto" style="height: calc(100vh - 170px); ">
+        <div class="flex-fill mt-3">
+          <div class="row">
+            <div class="col-12">
+              <ul class="list-inline d-flex flex-row mb-1">
+                <li class="list-inline-item" (click)="handleClickNavigationItem(file.itemPath)"
+                  *ngFor="let file of navigationExibicao; let first = first ; let last = last;">
+                  <div class="d-flex">
+                    <h5 style="color: black;" *ngIf="!first" class=" p-1">
+                      >
+                    </h5>
+                    <div style="border-radius: 5px;"
+                      [ngClass]="{'navigation-item p-1': true ,'navigation-item-interaction': !last ,'navigation-item-last': last}">
+                      <h5> {{file.name}}</h5>
+                    </div>
                   </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6 d-flex align-items-end pb-2">
+              <div class="row d-inline-flex ps-1">
+                <div class="col-6" (click)="handlerClickedArrow(navigationModeEnum.Back)">
+                  <fa-icon [icon]="faAngleLeft" size="lg"
+                    [ngClass]="hasItemBack() ? 'text-dark pointer' : 'text-danger '">
+                  </fa-icon>
                 </div>
-                <!-- <input type="file" #fileInput class="d-none h-0 w-0" multiple (change)="onFileSelected($event)" /> -->
+                <div class="col-6" (click)="handlerClickedArrow(navigationModeEnum.Foward)">
+                  <fa-icon [icon]="faAngleRight" size="lg"
+                    [ngClass]="hasItemFoward() ? 'text-dark pointer' : 'text-danger '">
+                  </fa-icon>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex flex-row-reverse  align-items-center">
                 <fa-icon *ngIf="!isLinkLayer" [icon]="faFileUpload" (click)="handleEdit()" size="lg"
                   [ngClass]="'text-primary pointer'">
                 </fa-icon>
@@ -85,10 +158,6 @@
             <!-- Header -->
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
 
-            <!-- A busca não bate -->
-            <tr class="mat-row" *matNoDataRow>
-            </tr>
-
             <!-- Evento de linha clicada -->
             <tr class="noselect" mat-row (dblclick)="handleDoubleClickedRow(row)"
               (click)="handleClickedRow(row, $event)" *matRowDef="let row; columns: displayedColumns;"
@@ -97,61 +166,43 @@
         </div>
       </div>
 
-      <!-- Preview -->
-      <div class="col-6 preview" *ngIf="showPreview && isAnySelected">
-        <!-- Detalhes do arquivo -->
-        <div class="row">
-          <h3>Detalhes</h3>
-        </div>
-        <form [formGroup]="nickNameForm">
-          <div class="row">
-            <ul style="list-style-type: none;">
-              <li *ngIf="!isNullOrEmpty(previewFile.name)">
-                <div class="row">
-                  <div class="col-auto">
-                    Nome: {{ isEditMode && previewFile.canEdit ? '' : previewFile.name }}
-                  </div>
-                  <div class="col px-0">
-                    <div *ngIf="previewFile.canEdit" class="d-flex">
-                      <!--                       <input style="width: fit-content;" type="text"/> -->
-                      <input *ngIf="isEditMode" #nickNameInput class="w-50" type="text" formControlName="name"
-                        (blur)="unfocusHandler()" (keydown.enter)="enterPressedHandler()" />
-                      <div *ngIf="!isEditMode" #buttonTeste class="ps-1" role="button" tabindex="0"
-                        (keydown.enter)="buttonHandler()" (click)="buttonHandler()">
-                        <fa-icon [icon]="faPen" size="lg"></fa-icon>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li *ngIf="!isNullOrEmpty(previewFile.size)">Tamanho: {{previewFile.size}}</li>
-              <li *ngIf="!isNullOrEmpty(previewFile.typeFile)">Tipo de Arquivo: {{previewFile.typeFile}}</li>
-              <li *ngIf="!isNullOrEmpty(previewFile.status)">Status: {{previewFile.status}}</li>
-              <li *ngIf="!isNullOrEmpty(previewFile.dataCriacao)">Criado em: {{previewFile.dataCriacao}}</li>
-              <li *ngIf="!isNullOrEmpty(previewFile.dataExpiracao)">Expira em: {{previewFile.dataExpiracao}}</li>
-              <li *ngIf="!isNullOrEmpty(previewFile.downloadLimit)">Limite de downloads: {{previewFile.downloadLimit}}
-              </li>
-              <li *ngIf="!isNullOrEmpty(previewFile.downloadCount)">Contagem de downloads: {{previewFile.downloadCount}}
-              </li>
-            </ul>
-          </div>
-        </form>
-      </div>
     </div>
   </div>
 </div>
 
+<ng-template #disableRemoveModalHeader>
+  <div class="row">
+    <div class="col-12">
+      <h4>
+        {{ disableDeleteModalHeaderText }}
+      </h4>
+    </div>
+  </div>
+</ng-template>
+
 <ng-template #disableRemoveModalBody>
   <div class="row">
-    {{ disableDeleteModalText }}
+    <div class="col-12">
+      {{ disableDeleteModalText }}
+    </div>
   </div>
 </ng-template>
 
 <ng-template #editModalBody>
-  <div class="row">  
+  <div class="row">
+    <div class="table">
+      <div class="d-flex " *ngFor="let file of filesUpload; let i = index">
+        <div class="name flex-grow-1">{{file.name}}|&nbsp;{{humanFileSize(file.size)}}</div>
+        <div class="">
+          <a class="remove" (click)="removeFile(i)" class="text-danger">
+            <fa-icon [icon]="faTrashAlt" size="lg"></fa-icon>
+          </a>
+        </div>
+      </div>
+    </div>
     <input type="file" #fileInput class="file-input d-none" multiple (change)="onFileSelected($event)" />
     <a (click)="openFileInput()">
-      <fa-icon [icon]="faCircle" size="lg" class="text-danger"></fa-icon>
+      <fa-icon [icon]="faFileUpload" size="lg" class="text-primary pointer"></fa-icon>
     </a>
   </div>
 </ng-template>

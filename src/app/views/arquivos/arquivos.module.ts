@@ -12,7 +12,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ModalComponent } from 'src/app/components/modal/modal.component';
-
 @NgModule({
   declarations: [ArquivosComponent, LoaderComponent, ModalComponent],
   imports: [

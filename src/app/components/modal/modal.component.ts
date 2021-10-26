@@ -21,5 +21,6 @@ export class ModalComponent implements OnInit {
 }
 
 export interface ModalData {
+  templateHeader: TemplateRef<any>;
   templateBody: TemplateRef<any>;
 }

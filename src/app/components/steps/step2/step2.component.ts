@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { FormControl } from '@angular/forms';
 import { IPlan } from 'src/app/interfaces/plan';
 import { formatDate } from '@angular/common';
+import { isNullOrEmpty } from 'src/app/_commom/util';
 
 @Component({
   selector: 'app-step2',
@@ -39,7 +40,7 @@ export class Step2Component implements OnInit, OnDestroy {
     date.setMilliseconds(999);
 
     this.securityCallback.emit({
-      requirePassword: this.requirePassword.value,
+      requirePassword: isNullOrEmpty(this.password.value) ? false : this.requirePassword.value,
       password: this.password.value,
       expirationDate: date.getTime(),
       downloadLimit: this.downloadLimit.value

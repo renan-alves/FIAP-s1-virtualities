@@ -1,13 +1,20 @@
 <div>
-  <h2 mat-dialog-title>Install Angular</h2>
-  <mat-dialog-content class="mat-typography">
-    <!-- {{data.bodyText}} -->
+  <div class="container">
+    <!-- Header -->
+    <ng-container [ngTemplateOutlet]="data.templateHeader">
+    </ng-container>
+
+    <!-- Body -->
     <ng-container [ngTemplateOutlet]="data.templateBody">
     </ng-container>
-  </mat-dialog-content>
-  <mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close [mat-dialog-close]="false" (click)="modalResult(false)">Cancelar</button>
-    <!-- <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Prosseguir</button> -->
-    <button mat-button cdkFocusInitial (click)="modalResult(true)">Prosseguir</button>
-  </mat-dialog-actions>
+
+    <!-- Footer -->
+    <div class="row">
+      <mat-dialog-actions align="end">
+        <button mat-dialog-close class="btn btn-secondary" [mat-dialog-close]="false"
+          (click)="modalResult(false)">Cancelar</button>
+        <button cdkFocusInitial class="ms-2 btn btn-primary" (click)="modalResult(true)">Prosseguir</button>
+      </mat-dialog-actions>
+    </div>
+  </div>
 </div>

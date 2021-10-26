@@ -1,11 +1,25 @@
 <div class="header">
   <a href="/"><span class="logo">SEGUE</span></a>
   <div class="d-none d-md-flex menu">
-    <ul *ngIf="showMenu" >
+    <ul *ngIf="showMenu">
       <li><a href="/planos">Planos</a></li>&nbsp;|&nbsp;
       <li><a href="/contato">Sobre nós</a></li>&nbsp;|&nbsp;
-      <li *ngIf="!isLoggedIn"><a href="/login">Fazer Login</a></li>
-      <li *ngIf="isLoggedIn"><a href="/arquivos">Meus Links</a></li>
+      <li *ngIf="!isLoggedIn"><a href="/login">Fazer Login</a>&nbsp;|&nbsp;</li>
+      <li *ngIf="isLoggedIn"><a href="/arquivos">Meus Links</a>&nbsp;|&nbsp;</li>
+      <li *ngIf="isLoggedIn">
+        <a>
+          <fa-icon popoverClass="" [icon]="faUser" size="lg" placement="bottom-right" [ngbPopover]="popContent" >
+          </fa-icon>
+          <ng-template #popContent>
+            <div class="" >
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item" (click)="deslogar()">Deslogar</li>
+                <li class="list-group-item" (click)="excluirConta()"><strong class="text-danger">Excluir conta</strong></li>
+              </ul>
+            </div>
+          </ng-template>
+        </a>
+      </li>
     </ul>
   </div>
   <a class="d-block d-md-none" (click)="toggleHamburger()">
@@ -17,6 +31,20 @@
       <li><a href="/contato">Sobre nós</a></li>
       <li *ngIf="!isLoggedIn"><a href="/login">Fazer Login</a></li>
       <li *ngIf="isLoggedIn"><a href="/arquivos">Meus Links</a></li>
+      <li *ngIf="isLoggedIn">
+        <a>
+          <fa-icon popoverClass="" [icon]="faUser" size="lg" placement="bottom-right" [ngbPopover]="popContent" >
+          </fa-icon>
+          <ng-template #popContent>
+            <div class="" >
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item" (click)="deslogar()">Deslogar</li>
+                <li class="list-group-item" (click)="excluirConta()"><strong class="text-danger">Excluir conta</strong></li>
+              </ul>
+            </div>
+          </ng-template>
+        </a>
+      </li>
     </ul>
   </div>
 </div>

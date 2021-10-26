@@ -13,8 +13,6 @@ import { FireService } from 'src/app/services/base/fire.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ModalComponent, ModalData } from 'src/app/components/modal/modal.component';
-import { error } from 'console';
-import { finalize } from 'rxjs/operators';
 
 const TEMP: FileGridData[] = [
 ];
@@ -37,6 +35,8 @@ export class ArquivosComponent implements OnInit {
   @ViewChild('buttonTeste') buttonTesteElement: ElementRef;
 
   @ViewChild('nickNameInput') nickNameInputElement: ElementRef;
+
+  @ViewChild('disableRemoveModalHeader') disableRemoveModalHeader: TemplateRef<any>;
 
   @ViewChild('disableRemoveModalBody') disableRemoveModalBody: TemplateRef<any>;
 
@@ -114,6 +114,8 @@ export class ArquivosComponent implements OnInit {
    */
   previewFile: PreviewFile;
 
+  isFolderLoading: boolean;
+
   actualPath: string;
 
   navigationLine: FilePathWithName[] = [];
@@ -136,6 +138,8 @@ export class ArquivosComponent implements OnInit {
    */
   isEditMode = false;
 
+  disableDeleteModalHeaderText = '';
+
   disableDeleteModalText = '';
 
   filesUpload: File[] = [];
@@ -150,7 +154,7 @@ export class ArquivosComponent implements OnInit {
     private authService: AuthService,
     private formBuilder: FormBuilder,
     private fireService: FireService,
-    public dialog: MatDialog) { }
+    public dialog: MatDialog,) { }
 
   async ngOnInit(): Promise<void> {
     this.previewFile = new PreviewFile();
@@ -163,6 +167,7 @@ export class ArquivosComponent implements OnInit {
     // Pega a informação de todos Compartilhamentos do usuário 
     this.allSharedFiles = await this.getAllSharedFilesOfLoggedUser();
 
+    // A partir dos arquivos da tabela Files, recupera os arquivos no Storage
     this.allFiles = await Promise.all(this.getAllLinks());
 
     this.knowItens.push({ fullPath: '/', itens: this.allFiles });
@@ -190,8 +195,8 @@ export class ArquivosComponent implements OnInit {
           status: file.active ?
             FileStatusEnum.Disponivel :
             FileStatusEnum.NaoDisponivel,
-          dataCriacao: formatDate(new Date(file.dateCreated), 'dd-MM-yyyy HH:mm', 'pt-BR'),
-          dataExpiracao: formatDate(new Date(file.expirationDate), 'dd-MM-yyyy HH:mm', 'pt-BR'),
+          dataCriacao: file.dateCreated,
+          dataExpiracao: file.expirationDate,
           downloadLimit: file.downloadLimit,
           downloadCount: file.downloadCount ?? 0,
         }
@@ -206,44 +211,52 @@ export class ArquivosComponent implements OnInit {
     return file.nickname;
   }
 
-  private async buildItens(path: string): Promise<Item[]> {
+  private async buildItens(path: string, resetKnowItem = false): Promise<Item[]> {
     const indexKnowItem = this.knowItens.findIndex(k => k.fullPath === path);
 
     if (indexKnowItem !== -1) {
-      return this.knowItens[indexKnowItem].itens;
-    } else {
-      const fileStorage = await this.afStorage.ref(path).listAll().toPromise();
-
-      const itens = await Promise.all(fileStorage.items.map(async (i, index) => {
-        // Pega as informações mais específicas do arquivo
-        const metadata = await fileStorage.items[index].getMetadata();
-        return (
-          {
-            completePath: i.fullPath,
-            name: i.name,
-            size: this.getSize(metadata),
-            typeFile: this.getFileType(metadata),
-            type: TypeItemEnum.SingleFile
-          }
-        ) as Item
-      }));
-
-      const folders = await Promise.all(fileStorage.prefixes.map(async p => {
-        return (
-          {
-            completePath: p.fullPath,
-            name: p.name,
-            size: '-',
-            type: TypeItemEnum.Folder
-          }
-        ) as Item
-      }));
-
-      const itensRetorno = itens.concat(folders);
-      this.knowItens.push({ fullPath: path, itens: itensRetorno });
-
-      return itensRetorno;
+      // Caso seja requisitado, reseta a informação em memória, para "forçar" um recarregamento deste diretório
+      if (resetKnowItem) {
+        this.knowItens.splice(indexKnowItem, 1);
+      } else {
+        return this.knowItens[indexKnowItem].itens;
+      }
     }
+
+    const fileStorage = await this.afStorage.ref(path).listAll().toPromise();
+
+    const itens = await Promise.all(fileStorage.items.map(async (i, index) => {
+      // Pega as informações mais específicas do arquivo
+      const metadata = await fileStorage.items[index].getMetadata();
+      const teste = await fileStorage.items[index].getDownloadURL();
+      console.log(teste);
+      //console.log(metadata);
+      return (
+        {
+          completePath: i.fullPath,
+          name: i.name,
+          size: this.getSize(metadata),
+          typeFile: this.getFileType(metadata),
+          type: TypeItemEnum.SingleFile
+        }
+      ) as Item
+    }));
+
+    const folders = await Promise.all(fileStorage.prefixes.map(async p => {
+      return (
+        {
+          completePath: p.fullPath,
+          name: p.name,
+          size: '-',
+          type: TypeItemEnum.Folder
+        }
+      ) as Item
+    }));
+
+    const itensRetorno = itens.concat(folders);
+    this.knowItens.push({ fullPath: path, itens: itensRetorno });
+
+    return itensRetorno;
   }
 
   /**
@@ -284,11 +297,12 @@ export class ArquivosComponent implements OnInit {
         docId: docId,
         canEdit: true,
         name: item.name,
-        status: this.getStatus(item.status),
+        status: item.status,
         dataCriacao: item.dataCriacao,
         dataExpiracao: item.dataExpiracao,
         downloadLimit: item.downloadLimit,
-        downloadCount: item.downloadCount ?? 0
+        downloadCount: item.downloadCount ?? 0,
+
       } as PreviewFile;
   }
 
@@ -307,6 +321,7 @@ export class ArquivosComponent implements OnInit {
   }
 
   private async handleClickedFolder(item: Item): Promise<void> {
+    this.isFolderLoading = true;
     this.previewFile = new PreviewFile();
     const itens = await this.buildItens(item.completePath);
 
@@ -315,6 +330,7 @@ export class ArquivosComponent implements OnInit {
     this.actualPath = item.completePath;
 
     this.buildGrid(itens);
+    this.isFolderLoading = false;
   }
 
   private handleClickedSingleFile(item: Item): void {
@@ -342,13 +358,7 @@ export class ArquivosComponent implements OnInit {
 
     navigationLineActual.forEach((n, index) => {
       let name;
-      // Se for o primeiro
-      if (index === 0) {
-        name = n.name;
-      } else {
-        name = ' > ' + n.name;
-      }
-      this.navigationExibicao.push({ name: name, itemPath: n.itemPath });
+      this.navigationExibicao.push({ name: n.name, itemPath: n.itemPath });
     });
   }
 
@@ -358,29 +368,28 @@ export class ArquivosComponent implements OnInit {
 
     // Avalia qual é o modal certo, a partir do modo de abertura
     if (mode === ModalOpenMode.Edit) {
+      this.disableDeleteModalHeaderText = 'Upload de Arquivos';
       modalBody = this.editModalBody;
 
     } else {
       modalBody = this.disableRemoveModalBody;
-      this.disableDeleteModalText = mode === ModalOpenMode.Disable ?
-        "Tem certeza que deseja desabilitar o compartilhamente deste Link?" :
-        "Tem certeza que deseja remover este arquivo?";
+
+      if (mode === ModalOpenMode.Disable) {
+        this.disableDeleteModalHeaderText = 'Desabilitar Link';
+        this.disableDeleteModalText = 'Tem certeza que deseja desabilitar permanentemente o compartilhamente deste Link?';
+      } else {
+        this.disableDeleteModalHeaderText = 'Apagar arquivos';
+        this.disableDeleteModalText = 'Tem certeza que deseja remover permanentemente os arquivos selecionados?';
+      }
     }
 
     // Abre o modal
     this.modalRef = this.dialog.open(ModalComponent, {
       data: {
+        templateHeader: this.disableRemoveModalHeader,
         templateBody: modalBody,
       } as ModalData
     });
-  }
-
-  /**
-   * Filtro de busca
-   */
-  applyFilter(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   /**
@@ -527,24 +536,55 @@ export class ArquivosComponent implements OnInit {
 
     // Espera o resultado
     this.modalRef.componentInstance.userAction.subscribe(
-      (userConfirm) => {
+      async (userConfirm) => {
         console.log(userConfirm);
         if (userConfirm) {
           if (mode === ModalOpenMode.Remove) {
-            this.selection.selected.forEach(arquivo => {
-              this.afStorage.ref(arquivo.item.completePath).delete()
-                .subscribe((result) => {
-                  // Atualiza o grid
-                  this.dataSource.data = this.dataSource.data.filter(d => d.item.completePath !== arquivo.item.completePath);
+            this.showLoader = true;
+            this.selection.selected.forEach(async (arquivo, index) => {
+              await this.afStorage.ref(arquivo.item.completePath).delete().toPromise();
 
-                  // Pega o diretório atual e atualiza a informação
-                  let diretorioAtual = this.knowItens.find(k => k.fullPath === this.actualPath).itens;
-                  this.knowItens.find(k => k.fullPath === this.actualPath).itens = diretorioAtual.filter(i => i.completePath !== arquivo.item.completePath);
-                },
-                  (err) => { console.error(err) });
+              if (index === this.selection.selected.length - 1) {
+                // Compila os arquivos que foram deletados
+                const arquivosDeletados = this.selection.selected.map(s => s.item.completePath);
+
+                // Atualiza a tabela
+                this.dataSource.data = this.dataSource.data
+                  .filter(d => arquivosDeletados.findIndex(a => a === d.item.completePath) === -1);
+
+                // Pega o diretório atual e atualiza a informação em memória
+                const diretorioAtual = this.knowItens.find(k => k.fullPath === this.actualPath).itens;
+                this.knowItens
+                  .find(k => k.fullPath === this.actualPath).itens = diretorioAtual
+                    .filter(d => arquivosDeletados
+                      .findIndex(a => a === d.completePath) === -1);
+              }
             });
+
+            this.showLoader = false;
           } else if (mode === ModalOpenMode.Disable) {
-            // TODO: Disable
+            this.showLoader = true;
+            this.selection.selected.forEach(async (arquivo, index) => {
+              // Atualiza a informação no firebase
+              await this.fireService.Firestore.collection('files').doc(arquivo.docId).set({ active: false }, { merge: true }).toPromise();
+
+              if (index === this.selection.selected.length - 1) {
+                // Compila os arquivos que foram desabilitados
+                const arquivosDesabilitados = this.selection.selected.map(s => s.item.completePath);
+
+                // Atualiza a tabela
+                this.dataSource.data
+                  .filter(d => arquivosDesabilitados.findIndex(a => a === d.item.completePath) !== -1)
+                  .forEach(d => d.status = FileStatusEnum.NaoDisponivel);
+
+                // Pega o diretório raiz(onde estão contidos os Links) e atualiza a informação
+                this.knowItens.find(k => k.fullPath === '/').itens
+                  .filter(d => arquivosDesabilitados.findIndex(a => a === d.completePath) !== -1)
+                  .forEach(a => a.status = FileStatusEnum.NaoDisponivel);
+              }
+            });
+
+            this.showLoader = false;
           }
         }
         this.modalRef.close();
@@ -554,27 +594,33 @@ export class ArquivosComponent implements OnInit {
 
   async handleEdit(): Promise<void> {
     await this.openDialog(ModalOpenMode.Edit);
-
     this.modalRef.componentInstance.userAction.subscribe(
-      (userConfirm) => {
+      async (userConfirm) => {
         if (userConfirm && this.filesUpload.length > 0) {
           this.showLoader = true;
           const uploadStatus = [] as boolean[];
 
-          this.filesUpload.forEach(fileUpload => {
-
-            console.log(fileUpload);
+          this.filesUpload.forEach(async fileUpload => {
             const path = this.actualPath + '/' + fileUpload.name;
 
             const task = this.afStorage.upload(path, fileUpload);
+
+            await task.snapshotChanges().toPromise();
             task.snapshotChanges().subscribe(
-              (snap) => {
+              async (snap) => {
                 if (snap.state === firebase.storage.TaskState.ERROR || snap.state === firebase.storage.TaskState.CANCELED || snap.state === firebase.storage.TaskState.PAUSED) {
                   // TODO: Tratar erro
                 }
 
                 if (snap.state === firebase.storage.TaskState.SUCCESS) {
                   uploadStatus.push(true);
+                }
+
+                if (uploadStatus.length === this.filesUpload.length) {
+                  const itens = await this.buildItens(this.actualPath, true);
+                  this.buildGrid(itens);
+                  this.filesUpload = [];
+                  this.modalRef.close();
                 }
               },
               (error) => {
@@ -583,9 +629,10 @@ export class ArquivosComponent implements OnInit {
               () => this.showLoader = false,
             );
           });
+        } else {
+          this.filesUpload = [];
+          this.modalRef.close();
         }
-        this.filesUpload = [];
-        this.modalRef.close();
       }
     );
   }
@@ -627,20 +674,47 @@ export class ArquivosComponent implements OnInit {
     }, 0);
   }
 
-  onFileSelected(event: 
-    { target: 
-      { 
-        files: File[]; 
-      }; 
+  onFileSelected(event:
+    {
+      target:
+      {
+        files: File[];
+      };
     }) {
 
     this.filesUpload = this.filesUpload.concat(Object.values(event.target.files));
-
-    console.log('asdasdasdijlk', Object.values(event.target.files));
   }
 
   openFileInput() {
     this.fileInput.nativeElement.click();
+  }
+
+  removeFile(index: number) {
+    this.filesUpload.splice(index, 1);
+    // this.getLeftSize();
+    /*     if (this.filesUpload.length < 1)
+          this.errorCallback.emit(null); */
+  }
+
+  humanFileSize(bytes: number): string {
+    return humanFileSize(bytes);
+  }
+
+  formatDate(date: number) {
+    return formatDate(new Date(date), 'dd-MM-yyyy HH:mm', 'pt-BR')
+  }
+
+  getDaysRemaining(dataExpiracao: number): string {
+    const dataAtualTime = new Date().getTime();
+    const dataVencimentoTime = new Date(dataExpiracao).getTime();
+
+    const diff = dataVencimentoTime - dataAtualTime;
+
+    if (diff < 0) {
+      return 'Expirado';
+    }
+    
+    return Math.ceil(diff / (1000 * 3600 * 24)).toString();
   }
 }
 
@@ -658,10 +732,10 @@ export class PreviewFile {
   canEdit: boolean;
   name: string;
   size: string;
-  status: string;
+  status: FileStatusEnum;
   typeFile: string;
-  dataCriacao: string;
-  dataExpiracao: string;
+  dataCriacao: number;
+  dataExpiracao: number;
   downloadLimit: number;
   downloadCount: number;
 }
@@ -674,8 +748,8 @@ export class Item {
   size: string;
   typeFile: string;
   status: FileStatusEnum;
-  dataCriacao: string;
-  dataExpiracao: string;
+  dataCriacao: number;
+  dataExpiracao: number;
   downloadLimit: number;
   downloadCount: number;
 }
