@@ -16,6 +16,7 @@ import { FooterComponent } from './components/footer/footer.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import localePt from '@angular/common/locales/pt';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 registerLocaleData(localePt);
 
 @NgModule({
@@ -34,7 +35,8 @@ registerLocaleData(localePt);
     AngularFireFunctionsModule,
     AngularFireAuthModule,
     FontAwesomeModule,
-    BrowserAnimationsModule    
+    BrowserAnimationsModule,
+    NgbModule    
   ],
   providers: [
     { provide: REGION, useValue: 'southamerica-east1' },
