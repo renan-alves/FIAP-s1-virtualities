@@ -37,8 +37,6 @@ export type RemoteConfigSettings = firebase.remoteConfig.Settings;
 export type RemoteConfigValue = firebase.remoteConfig.Value;
 export type RemoteConfigLogLevel = firebase.remoteConfig.LogLevel;
 export type UploadMetadata = firebase.storage.UploadMetadata;
-export const FieldValue = firebase.firestore.FieldValue;
-export const FieldPath = firebase.firestore.FieldPath;
 
 type FirebaseObservable<T, U, V, E> = (
   nextOrObserver: firebase.Observer<T, Error> | ((a: T) => U),
