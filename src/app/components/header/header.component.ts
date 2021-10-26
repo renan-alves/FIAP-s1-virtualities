@@ -4,7 +4,10 @@ import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { FireService } from 'src/app/services/base/fire.service';
 import firebase from 'firebase';
-
+import { EMPTY, of } from 'rxjs';
+import { mergeMap, tap } from 'rxjs/operators';
+import { IUser } from 'src/app/interfaces/users';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -16,35 +19,50 @@ export class HeaderComponent implements OnInit {
   expanded: boolean;
   isLoggedIn: boolean;
   showMenu: boolean;
+  showMyLinks: boolean;
   user: firebase.User;
 
-  constructor(private afAuth: AngularFireAuth, private authService: AuthService, private fireService: FireService) {
-    this.afAuth.authState.subscribe(user => {
-      this.user = user;
-    
-      if (user && !user.isAnonymous && user.emailVerified)
-        this.isLoggedIn = true;
-      else this.isLoggedIn = false;
+  constructor(private afAuth: AngularFireAuth,
+    private fireService: FireService,
+    private authService: AuthService,
+    private route: Router) {
 
-      console.log(this.isLoggedIn);
-
-      this.showMenu = true;
-    })
   }
 
   ngOnInit(): void {
+    this.afAuth.authState.pipe(
+      tap((user) => {
+        this.user = user;
+        if (user && !user.isAnonymous && user.emailVerified)
+          this.isLoggedIn = true;
+        else this.isLoggedIn = false;
+      }),
+      mergeMap((user) => {
+        if (user) return of(user)
+        this.showMenu = true;
+        return EMPTY
+      }),
+      mergeMap((user) => this.fireService.Firestore.collection("users").doc(user.uid).get())
+    ).subscribe(userDoc => {
+      const user = userDoc.data() as IUser;
 
+      if (user.planId === "PRO")
+        this.showMyLinks = true;
+
+      this.showMenu = true;
+    })
   }
 
   toggleHamburger() {
     this.expanded = !this.expanded;
   }
 
-  async deslogar(){
+  async deslogar() {
     await this.authService.SignOut();
+    this.goHome();
   }
 
-  async excluirConta(){
+  async excluirConta() {
     const userRef = this.fireService.Firestore.collection("users").doc(this.authService.getCurrentUser.uid);
 
     const fileRef = this.fireService.Firestore.collection("files").where("userId", "==", this.authService.getCurrentUser.uid);
@@ -58,5 +76,10 @@ export class HeaderComponent implements OnInit {
     await this.authService.SignOut();
     userRef.delete().subscribe();
     await this.user.delete();
+    this.goHome();
+  }
+
+  goHome(): void {
+    this.route.navigate(["/"]);
   }
 }
