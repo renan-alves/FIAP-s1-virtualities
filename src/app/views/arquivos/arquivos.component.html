@@ -1,40 +1,43 @@
 <!-- Loader da página -->
 <app-loader [show]="showLoader">
 </app-loader>
+
 <div class="arquivos">
+  
   <div class="position-fixed mt-3" style="right: 0; width: 32%;">
     <!-- Preview -->
     <div class="preview ps-0 pe-4" *ngIf="showPreview && isAnySelected">
       <!-- Detalhes do arquivo -->
-      <form [formGroup]="nickNameForm">
-        <div class="row">
-          <div class="col-auto">
-            <h4>{{ isEditMode && previewFile.canEdit ? '' : previewFile.name }}</h4>
-          </div>
-          <div class="col px-0 d-flex">
-            <div *ngIf="previewFile.canEdit" class="">
+      <div class="row">
+        <div class="col-auto">
+          <h4>{{ isEditMode && previewFile.canEdit ? '' : previewFile.name }}</h4>
+        </div>
+        <div class="col px-0 d-flex">
+          <div *ngIf="previewFile.canEdit" class="">
+            <form [formGroup]="nickNameForm">
               <input *ngIf="isEditMode" #nickNameInput class="w-100" type="text" formControlName="name"
                 (blur)="unfocusHandler()" (keydown.enter)="enterPressedHandler()" />
-              <div *ngIf="!isEditMode" #buttonTeste class="ps-1" role="button" tabindex="0"
-                (keydown.enter)="buttonHandler()" (click)="buttonHandler()">
-                <fa-icon [icon]="faPen" size="lg"></fa-icon>
-              </div>
+            </form>
+            <div *ngIf="!isEditMode" #buttonTeste class="ps-1" role="button" tabindex="0"
+              (keydown.enter)="buttonHandler()" (click)="buttonHandler()">
+              <fa-icon [icon]="faPen" size="lg"></fa-icon>
             </div>
-            <div class="icon-remove ps-2">
-              <div *ngIf="canRemove && !isFolderLoading">
-                <fa-icon *ngIf="isLinkLayer; else remove" [icon]="faBan"
-                  (click)="handleDisableRemove(modalOpenMode.Disable)" size="lg" [ngClass]="'text-danger pointer'">
+          </div>
+          <div class="icon-remove ps-2">
+            <div *ngIf="canRemove && !isFolderLoading">
+              <fa-icon *ngIf="isLinkLayer; else remove" [icon]="faBan"
+                (click)="handleDisableRemove(modalOpenMode.Disable)" size="lg" [ngClass]="'text-danger pointer'">
+              </fa-icon>
+              <ng-template #remove>
+                <fa-icon [icon]="faTrashAlt" (click)="handleDisableRemove(modalOpenMode.Remove)" size="lg"
+                  [ngClass]="'text-danger pointer'">
                 </fa-icon>
-                <ng-template #remove>
-                  <fa-icon [icon]="faTrashAlt" (click)="handleDisableRemove(modalOpenMode.Remove)" size="lg"
-                    [ngClass]="'text-danger pointer'">
-                  </fa-icon>
-                </ng-template>
-              </div>
+              </ng-template>
             </div>
           </div>
         </div>
-      </form>
+      </div>
+
       <div class="row">
         <ul style="list-style-type: none;">
           <li *ngIf="!isNullOrEmpty(previewFile.size)">Tamanho: {{previewFile.size}}</li>
@@ -72,7 +75,7 @@
         <div class="col-6">
           <div class="card text-center h-100">
             <div class="card-body">
-              <h4 class="card-title h4  "> Downloads Restantes</h4>
+              <h4 class="card-title h4"> Downloads Restantes</h4>
               <h3 class=""><strong>{{ previewFile.downloadLimit - previewFile.downloadCount }}</strong></h3>
             </div>
           </div>
@@ -125,7 +128,6 @@
               </div>
             </div>
           </div>
-
           <table mat-table [dataSource]="dataSource" class="w-100">
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef> Nome </th>

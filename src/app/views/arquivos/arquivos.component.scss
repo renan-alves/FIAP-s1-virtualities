@@ -41,12 +41,6 @@
     }
   }
 
-  .icon-plus {
-    width: 28px;
-    height: 28px;
-    background-image: url(/src/assets/icons/plus-fill-circle.svg);
-  }
-
   .navigation-item-last {
     cursor: default;
     h5 {
@@ -66,8 +60,4 @@
       filter: invert(30%) sepia(100%) saturate(921%) hue-rotate(175deg) brightness(97%) contrast(97%);
     }
   }
-
-/*   .container-fluid{
-      
-  } */
 }

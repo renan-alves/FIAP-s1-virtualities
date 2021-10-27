@@ -17,6 +17,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import localePt from '@angular/common/locales/pt';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { SharedModule } from './shared.module';
 registerLocaleData(localePt);
 
 @NgModule({
@@ -36,7 +37,8 @@ registerLocaleData(localePt);
     AngularFireAuthModule,
     FontAwesomeModule,
     BrowserAnimationsModule,
-    NgbModule    
+    NgbModule,
+    SharedModule
   ],
   providers: [
     { provide: REGION, useValue: 'southamerica-east1' },
