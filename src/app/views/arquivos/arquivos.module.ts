@@ -12,8 +12,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ModalComponent } from 'src/app/components/modal/modal.component';
+import { SharedModule } from 'src/app/shared.module';
 @NgModule({
-  declarations: [ArquivosComponent, LoaderComponent, ModalComponent],
+  declarations: [ArquivosComponent, LoaderComponent],
   imports: [
     CommonModule,
     ArquivosRoutingModule,
@@ -22,9 +23,9 @@ import { ModalComponent } from 'src/app/components/modal/modal.component';
     MatInputModule,
     FontAwesomeModule,
     MatProgressSpinnerModule,
+    SharedModule,
     FormsModule,
     ReactiveFormsModule,
-    MatDialogModule
   ]
 })
 export class ArquivosModule { }

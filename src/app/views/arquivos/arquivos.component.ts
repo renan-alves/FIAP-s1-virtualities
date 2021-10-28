@@ -8,7 +8,7 @@ import { FilessService } from 'src/app/services/files/files.service';
 import { faAngleLeft, faAngleRight, faBan, faCircle, faFileUpload, faPen, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { formatDate } from '@angular/common';
 import { humanFileSize, isNullOrEmpty } from 'src/app/_commom/util';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { FireService } from 'src/app/services/base/fire.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -76,7 +76,7 @@ export class ArquivosComponent implements OnInit {
   /**
    * Armazena os compartilhamentos do usuário
    */
-  private allFiles: Item[];
+  private allFiles: Item[] = [];
 
   /**
    * Armazena as informações dos arquivos em memória, para evitar carregamentos desnecessário
@@ -129,8 +129,8 @@ export class ArquivosComponent implements OnInit {
 
   selection = new SelectionModel<FileGridData>(true, []);
 
-  nickNameForm = this.formBuilder.group({
-    name: '',
+  nickNameForm = new FormGroup({
+    name: new FormControl(''),
   });
 
   /**
@@ -145,6 +145,11 @@ export class ArquivosComponent implements OnInit {
   filesUpload: File[] = [];
 
   modalRef: MatDialogRef<ModalComponent, any>;
+
+  profileForm = new FormGroup({
+    firstName: new FormControl(''),
+    lastName: new FormControl(''),
+  });
 
   @ViewChild('fileInput') fileInput: ElementRef;
 
@@ -166,6 +171,11 @@ export class ArquivosComponent implements OnInit {
 
     // Pega a informação de todos Compartilhamentos do usuário 
     this.allSharedFiles = await this.getAllSharedFilesOfLoggedUser();
+
+    // Se não tem conteúdo, garante que não estará null ou undefinied 
+    if (this.allSharedFiles === null || this.allSharedFiles === undefined) {
+      this.allSharedFiles = [];
+    }
 
     // A partir dos arquivos da tabela Files, recupera os arquivos no Storage
     this.allFiles = await Promise.all(this.getAllLinks());
@@ -537,7 +547,6 @@ export class ArquivosComponent implements OnInit {
     // Espera o resultado
     this.modalRef.componentInstance.userAction.subscribe(
       async (userConfirm) => {
-        console.log(userConfirm);
         if (userConfirm) {
           if (mode === ModalOpenMode.Remove) {
             this.showLoader = true;
@@ -581,6 +590,9 @@ export class ArquivosComponent implements OnInit {
                 this.knowItens.find(k => k.fullPath === '/').itens
                   .filter(d => arquivosDesabilitados.findIndex(a => a === d.completePath) !== -1)
                   .forEach(a => a.status = FileStatusEnum.NaoDisponivel);
+
+                // Se desabilitou, atualiza o Preview também
+                this.previewFile.status = FileStatusEnum.NaoDisponivel;
               }
             });
 
@@ -609,7 +621,6 @@ export class ArquivosComponent implements OnInit {
             task.snapshotChanges().subscribe(
               async (snap) => {
                 if (snap.state === firebase.storage.TaskState.ERROR || snap.state === firebase.storage.TaskState.CANCELED || snap.state === firebase.storage.TaskState.PAUSED) {
-                  // TODO: Tratar erro
                 }
 
                 if (snap.state === firebase.storage.TaskState.SUCCESS) {
@@ -624,7 +635,6 @@ export class ArquivosComponent implements OnInit {
                 }
               },
               (error) => {
-                // TODO: Tratar erro
               },
               () => this.showLoader = false,
             );
@@ -648,7 +658,8 @@ export class ArquivosComponent implements OnInit {
   unfocusHandler(): void {
     // Sinaliza que a edição acabou
     this.isEditMode = false;
-
+    console.log('unfocusHandler', this.nickNameForm)
+    console.log('profileForm', this.profileForm.value)
     // Se o valor for o mesmo, não modificou nada
     if (this.nickNameForm.value['name'] === this.previewFile.name) {
       return;
@@ -713,8 +724,8 @@ export class ArquivosComponent implements OnInit {
     if (diff < 0) {
       return 'Expirado';
     }
-    
-    return Math.ceil(diff / (1000 * 3600 * 24)).toString();
+
+    return Math.ceil(diff / (1000 * 3600 * 24)).toString() + "  dias";
   }
 }
 

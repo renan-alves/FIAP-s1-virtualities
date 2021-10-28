@@ -17,7 +17,6 @@ export class ModalComponent implements OnInit {
   modalResult(result: boolean) {
     this.userAction.emit(result);
   }
-
 }
 
 export interface ModalData {
