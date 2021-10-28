@@ -21,8 +21,11 @@ export class HeaderComponent implements OnInit {
   expanded: boolean;
   isLoggedIn: boolean;
   showMenu: boolean;
-  showMyLinks: boolean;
   user: firebase.User;
+
+  get showMyLinks(): boolean {
+    return this.authService.userPlan === 'PRO';
+  }
 
   @ViewChild('deleteModalHeader') deleteModalHeader: TemplateRef<any>;
 
@@ -58,7 +61,7 @@ export class HeaderComponent implements OnInit {
       const user = userDoc.data() as IUser;
 
       if (user.planId === "PRO")
-        this.showMyLinks = true;
+        this.authService.SetUserPlan('PRO');
 
       this.showMenu = true;
     })
@@ -93,8 +96,8 @@ export class HeaderComponent implements OnInit {
             fileSnap.docs.forEach(doc => {
               doc.ref.delete().subscribe();
             })
-
           });
+
           await this.authService.SignOut();
           userRef.delete().subscribe();
           await this.user.delete();

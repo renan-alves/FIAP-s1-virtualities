@@ -14,6 +14,7 @@ import { UserService } from '../users/users.service';
 
 export class AuthService {
   userData: firebase.User;
+  userPlan: string = 'FREE';
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -30,6 +31,10 @@ export class AuthService {
         JSON.parse(localStorage.getItem('user'));
       }
     })
+  }
+
+  SetUserPlan(newPlan: string) {
+    this.userPlan = newPlan;
   }
 
   SignIn(email: string, senha: string): Promise<firebase.auth.UserCredential> {
